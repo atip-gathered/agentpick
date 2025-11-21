@@ -90,7 +90,7 @@ function App() {
             position: 'ソフトウェアエンジニア',
             email: 'tanaka@example.com',
             phone: '090-1234-5678',
-            status: 'active',
+            status: 'before_first_meeting',
             matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
             desiredPosition: 'シニアエンジニア',
             hasProfileAccess: false,
@@ -556,6 +556,9 @@ function App() {
                             matchedUsers={matchedUsers}
                             agentData={agentData}
                             childAgents={childAgents}
+                            onViewProfile={(user) => {
+                                setSelectedUserProfile(user);
+                            }}
                         />
                     )}
                     

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Users, Search, Filter, Check, Clock, CheckCircle, XCircle, Eye, MessageCircle, MoreVertical, X, User } from 'lucide-react';
 
-const AgentMatching = ({ matchedUsers, onNavigateToUser, onNavigateToChat, onUpdateUserStatus, agentData, childAgents }) => {
+const AgentMatching = ({ matchedUsers, onNavigateToUser, onNavigateToChat, onUpdateUserStatus, agentData, childAgents, onViewProfile }) => {
     const isParentAccount = agentData?.isParentAccount || false;
     
     // Get child agent name by ID
@@ -31,10 +31,13 @@ const AgentMatching = ({ matchedUsers, onNavigateToUser, onNavigateToChat, onUpd
 
     const statusOptions = [
         { value: 'all', label: 'すべて', count: matchedUsers.length },
-        { value: 'active', label: 'アクティブ', icon: CheckCircle, color: '#34C759', count: matchedUsers.filter(u => u.status === 'active').length },
+        { value: 'before_first_meeting', label: '初回面談前', icon: Clock, color: '#999', count: matchedUsers.filter(u => u.status === 'before_first_meeting').length },
+        { value: 'first_meeting_done', label: '初回面談済み', icon: CheckCircle, color: '#34C759', count: matchedUsers.filter(u => u.status === 'first_meeting_done').length },
         { value: 'in_progress', label: '対応中', icon: Clock, color: '#FF9500', count: matchedUsers.filter(u => u.status === 'in_progress').length },
-        { value: 'completed', label: '完了', icon: Check, color: '#007AFF', count: matchedUsers.filter(u => u.status === 'completed').length },
-        { value: 'declined', label: '辞退', icon: XCircle, color: '#FF3B30', count: matchedUsers.filter(u => u.status === 'declined').length }
+        { value: 'offer_accepted', label: '内定承諾', icon: Check, color: '#007AFF', count: matchedUsers.filter(u => u.status === 'offer_accepted').length },
+        { value: 'rejected', label: '落選', icon: XCircle, color: '#FF3B30', count: matchedUsers.filter(u => u.status === 'rejected').length },
+        { value: 'withdrawn', label: '辞退', icon: XCircle, color: '#FF6B6B', count: matchedUsers.filter(u => u.status === 'withdrawn').length },
+        { value: 'no_response', label: '音信不通', icon: XCircle, color: '#666', count: matchedUsers.filter(u => u.status === 'no_response').length }
     ];
 
     const getStatusInfo = (status) => {
@@ -650,11 +653,19 @@ const AgentMatching = ({ matchedUsers, onNavigateToUser, onNavigateToChat, onUpd
                                                 alignItems: 'center',
                                                 marginBottom: '4px'
                                             }}>
-                                                <span style={{
-                                                    fontSize: '15px',
-                                                    fontWeight: '600',
-                                                    color: '#333'
-                                                }}>
+                                                <span 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onViewProfile && onViewProfile(user);
+                                                    }}
+                                                    style={{
+                                                        fontSize: '15px',
+                                                        fontWeight: '600',
+                                                        color: '#007AFF',
+                                                        cursor: 'pointer',
+                                                        textDecoration: 'underline'
+                                                    }}
+                                                >
                                                     {user.name}
                                                 </span>
                                                 <span style={{
