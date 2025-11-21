@@ -544,78 +544,104 @@ const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser
                 padding: '12px 16px',
                 borderTop: '1px solid #E5E5E5'
             }}>
-                <div style={{
-                    display: 'flex',
-                    gap: '8px',
-                    alignItems: 'flex-end'
-                }}>
-                    <button
-                        onMouseEnter={() => setHoveredItem('attach-btn')}
-                        onMouseLeave={() => setHoveredItem(null)}
-                        style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '50%',
-                            border: 'none',
-                            background: hoveredItem === 'attach-btn' ? '#F0F0F0' : 'transparent',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'background 0.2s ease'
-                        }}
-                    >
-                        <Paperclip size={20} color="#666" />
-                    </button>
-
+                {!selectedUser.hasProfileAccess ? (
                     <div style={{
-                        flex: 1,
-                        background: '#F5F5F5',
-                        borderRadius: '20px',
-                        padding: '8px 16px',
-                        display: 'flex',
-                        alignItems: 'center'
+                        textAlign: 'center',
+                        padding: '12px',
+                        background: '#FFF4E5',
+                        borderRadius: '12px',
+                        border: '1px solid #FFE5CC'
                     }}>
-                        <input
-                            type="text"
-                            placeholder="メッセージを入力..."
-                            value={messageText}
-                            onChange={(e) => setMessageText(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                            style={{
-                                flex: 1,
-                                border: 'none',
-                                background: 'transparent',
-                                outline: 'none',
-                                fontSize: '15px',
-                                color: '#333'
-                            }}
-                        />
+                        <p style={{
+                            margin: 0,
+                            fontSize: '13px',
+                            color: '#FF9500',
+                            fontWeight: '500'
+                        }}>
+                            ⏳ 求職者からのメッセージをお待ちください
+                        </p>
+                        <p style={{
+                            margin: '4px 0 0 0',
+                            fontSize: '12px',
+                            color: '#999'
+                        }}>
+                            求職者が最初のメッセージを送信すると、メッセージの送信とプロフィール情報の閲覧が可能になります
+                        </p>
                     </div>
+                ) : (
+                    <div style={{
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'flex-end'
+                    }}>
+                        <button
+                            onMouseEnter={() => setHoveredItem('attach-btn')}
+                            onMouseLeave={() => setHoveredItem(null)}
+                            style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                border: 'none',
+                                background: hoveredItem === 'attach-btn' ? '#F0F0F0' : 'transparent',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'background 0.2s ease'
+                            }}
+                        >
+                            <Paperclip size={20} color="#666" />
+                        </button>
 
-                    <button
-                        onClick={handleSendMessage}
-                        onMouseEnter={() => setHoveredItem('send-btn')}
-                        onMouseLeave={() => setHoveredItem(null)}
-                        disabled={!messageText.trim()}
-                        style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '50%',
-                            border: 'none',
-                            background: messageText.trim() 
-                                ? (hoveredItem === 'send-btn' ? '#0051CC' : '#007AFF')
-                                : '#E5E5E5',
-                            cursor: messageText.trim() ? 'pointer' : 'not-allowed',
+                        <div style={{
+                            flex: 1,
+                            background: '#F5F5F5',
+                            borderRadius: '20px',
+                            padding: '8px 16px',
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.2s ease'
-                        }}
-                    >
-                        <Send size={18} color={messageText.trim() ? 'white' : '#999'} />
-                    </button>
-                </div>
+                            alignItems: 'center'
+                        }}>
+                            <input
+                                type="text"
+                                placeholder="メッセージを入力..."
+                                value={messageText}
+                                onChange={(e) => setMessageText(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                                style={{
+                                    flex: 1,
+                                    border: 'none',
+                                    background: 'transparent',
+                                    outline: 'none',
+                                    fontSize: '15px',
+                                    color: '#333'
+                                }}
+                            />
+                        </div>
+
+                        <button
+                            onClick={handleSendMessage}
+                            onMouseEnter={() => setHoveredItem('send-btn')}
+                            onMouseLeave={() => setHoveredItem(null)}
+                            disabled={!messageText.trim()}
+                            style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                border: 'none',
+                                background: messageText.trim() 
+                                    ? (hoveredItem === 'send-btn' ? '#0051CC' : '#007AFF')
+                                    : '#E5E5E5',
+                                cursor: messageText.trim() ? 'pointer' : 'not-allowed',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            <Send size={18} color={messageText.trim() ? 'white' : '#999'} />
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

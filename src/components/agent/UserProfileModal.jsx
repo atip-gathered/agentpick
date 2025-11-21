@@ -1,8 +1,42 @@
-import React, { useState } from 'react';
-import { X, Mail, Phone, MapPin, Calendar, User, Briefcase, FileText, Download } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Mail, Phone, MapPin, Calendar, User, Briefcase, FileText, Download, CheckCircle } from 'lucide-react';
 
-const UserProfileModal = ({ user, onClose }) => {
+const UserProfileModal = ({ user, onClose, onStatusChange }) => {
     const [hoveredItem, setHoveredItem] = useState(null);
+    const [currentStatus, setCurrentStatus] = useState(user?.status || 'active');
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+
+    useEffect(() => {
+        if (user) {
+            setCurrentStatus(user.status || 'active');
+        }
+    }, [user]);
+
+    const handleStatusChange = (newStatus) => {
+        setCurrentStatus(newStatus);
+        
+        // Call parent callback if provided
+        if (onStatusChange) {
+            onStatusChange(user.id, newStatus);
+        }
+        
+        // Show toast notification
+        const statusLabels = {
+            'active': 'アクティブ',
+            'in_progress': '選考中',
+            'hired': '内定',
+            'closed': 'クローズ'
+        };
+        
+        setToastMessage(`ステータスを「${statusLabels[newStatus]}」に変更しました`);
+        setShowToast(true);
+        
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+            setShowToast(false);
+        }, 3000);
+    };
 
     if (!user) return null;
 
@@ -17,6 +51,7 @@ const UserProfileModal = ({ user, onClose }) => {
                 background: 'rgba(0,0,0,0.5)',
                 display: 'flex',
                 alignItems: 'flex-end',
+                justifyContent: 'center',
                 zIndex: 2000
             }}
             onClick={onClose}
@@ -26,6 +61,7 @@ const UserProfileModal = ({ user, onClose }) => {
                 style={{
                     background: 'white',
                     width: '100%',
+                    maxWidth: '430px',
                     maxHeight: '90vh',
                     borderRadius: '20px 20px 0 0',
                     overflowY: 'auto',
@@ -80,7 +116,7 @@ const UserProfileModal = ({ user, onClose }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '16px',
-                        marginBottom: '24px',
+                        marginBottom: '16px',
                         padding: '20px',
                         background: '#F8F8F8',
                         borderRadius: '12px'
@@ -115,6 +151,46 @@ const UserProfileModal = ({ user, onClose }) => {
                                 {user.position || '職種未設定'}
                             </p>
                         </div>
+                    </div>
+
+                    {/* Status Selector */}
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '12px',
+                        border: '1px solid #E5E5E5',
+                        padding: '16px',
+                        marginBottom: '24px'
+                    }}>
+                        <label style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '8px',
+                            display: 'block',
+                            fontWeight: '500'
+                        }}>
+                            選考ステータス
+                        </label>
+                        <select
+                            value={currentStatus}
+                            onChange={(e) => handleStatusChange(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                borderRadius: '8px',
+                                border: '1px solid #E5E5E5',
+                                fontSize: '15px',
+                                fontWeight: '500',
+                                outline: 'none',
+                                background: 'white',
+                                cursor: 'pointer',
+                                color: '#333'
+                            }}
+                        >
+                            <option value="active">アクティブ</option>
+                            <option value="in_progress">選考中</option>
+                            <option value="hired">内定</option>
+                            <option value="closed">クローズ</option>
+                        </select>
                     </div>
 
                     {/* Basic Info Section */}
@@ -407,6 +483,32 @@ const UserProfileModal = ({ user, onClose }) => {
                     </div>
                 </div>
 
+                {/* Toast Notification */}
+                {showToast && (
+                    <div style={{
+                        position: 'fixed',
+                        top: '80px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: '#34C759',
+                        color: 'white',
+                        padding: '14px 20px',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(52, 199, 89, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        zIndex: 3000,
+                        animation: 'toastSlideDown 0.3s ease',
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        maxWidth: '90%'
+                    }}>
+                        <CheckCircle size={20} />
+                        {toastMessage}
+                    </div>
+                )}
+
                 {/* Animation */}
                 <style>
                     {`
@@ -416,6 +518,17 @@ const UserProfileModal = ({ user, onClose }) => {
                             }
                             to {
                                 transform: translateY(0);
+                            }
+                        }
+                        
+                        @keyframes toastSlideDown {
+                            from {
+                                transform: translate(-50%, -20px);
+                                opacity: 0;
+                            }
+                            to {
+                                transform: translate(-50%, 0);
+                                opacity: 1;
                             }
                         }
                     `}

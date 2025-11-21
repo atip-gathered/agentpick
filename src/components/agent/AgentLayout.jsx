@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, MessageCircle, Users, User, LogOut, Menu, X } from 'lucide-react';
 
-const AgentLayout = ({ children, activeTab, onNavigate, onLogout, agentName }) => {
+const AgentLayout = ({ children, activeTab, onNavigate, onLogout, agentName, unreadCount = 0 }) => {
     const [hoveredTab, setHoveredTab] = useState(null);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     const navItems = [
         { id: 'dashboard', label: 'ダッシュボード', icon: LayoutDashboard },
-        { id: 'messages', label: 'メッセージ', icon: MessageCircle },
+        { id: 'messages', label: 'メッセージ', icon: MessageCircle, badge: unreadCount },
         { id: 'matching', label: 'ユーザー管理', icon: Users },
         { id: 'profile', label: 'プロフィール', icon: User }
     ];
@@ -175,11 +175,30 @@ const AgentLayout = ({ children, activeTab, onNavigate, onLogout, agentName }) =
                                             fontSize: '15px',
                                             fontWeight: isActive ? '600' : '500',
                                             transition: 'all 0.2s ease',
-                                            textAlign: 'left'
+                                            textAlign: 'left',
+                                            position: 'relative'
                                         }}
                                     >
                                         <Icon size={20} color={isActive ? '#007AFF' : '#666'} />
                                         {item.label}
+                                        {item.badge > 0 && (
+                                            <div style={{
+                                                minWidth: '20px',
+                                                height: '20px',
+                                                borderRadius: '10px',
+                                                background: '#FF3B30',
+                                                color: 'white',
+                                                fontSize: '11px',
+                                                fontWeight: 'bold',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                padding: '0 6px',
+                                                marginLeft: 'auto'
+                                            }}>
+                                                {item.badge > 99 ? '99+' : item.badge}
+                                            </div>
+                                        )}
                                     </button>
                                 );
                             })}
@@ -258,7 +277,8 @@ const AgentLayout = ({ children, activeTab, onNavigate, onLogout, agentName }) =
                                 alignItems: 'center',
                                 gap: '4px',
                                 transition: 'all 0.2s ease',
-                                transform: hoveredTab === item.id ? 'translateY(-2px)' : 'translateY(0)'
+                                transform: hoveredTab === item.id ? 'translateY(-2px)' : 'translateY(0)',
+                                position: 'relative'
                             }}
                         >
                             <div style={{
@@ -269,12 +289,34 @@ const AgentLayout = ({ children, activeTab, onNavigate, onLogout, agentName }) =
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                transition: 'all 0.2s ease'
+                                transition: 'all 0.2s ease',
+                                position: 'relative'
                             }}>
                                 <Icon 
                                     size={20} 
                                     color={isActive ? 'white' : (hoveredTab === item.id ? '#007AFF' : '#999')}
                                 />
+                                {item.badge > 0 && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '-4px',
+                                        right: '-4px',
+                                        minWidth: '18px',
+                                        height: '18px',
+                                        borderRadius: '9px',
+                                        background: '#FF3B30',
+                                        color: 'white',
+                                        fontSize: '10px',
+                                        fontWeight: 'bold',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        padding: '0 5px',
+                                        boxShadow: '0 2px 4px rgba(255,59,48,0.3)'
+                                    }}>
+                                        {item.badge > 99 ? '99+' : item.badge}
+                                    </div>
+                                )}
                             </div>
                             <span style={{
                                 fontSize: '11px',

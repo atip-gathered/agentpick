@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, MessageCircle, Users, Calendar, Heart, Clock } from 'lucide-react';
+import { TrendingUp, MessageCircle, Users, Heart } from 'lucide-react';
 
 const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
     const [hoveredCard, setHoveredCard] = useState(null);
@@ -11,15 +11,20 @@ const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
         return sum + msgs.filter(msg => msg.sender === 'user' && !msg.read).length;
     }, 0);
 
-    // Recent activity (last 7 days)
-    const recentActivity = matchedUsers
-        .filter(user => {
-            const matchDate = new Date(user.matchedAt);
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-            return matchDate >= sevenDaysAgo;
+    // Get unread messages list
+    const unreadMessagesList = Object.entries(messages)
+        .flatMap(([userId, userMessages]) => {
+            const user = matchedUsers.find(u => u.id === parseInt(userId));
+            if (!user) return [];
+            
+            return userMessages
+                .filter(msg => msg.sender === 'user' && !msg.read)
+                .map(msg => ({
+                    ...msg,
+                    user: user
+                }));
         })
-        .sort((a, b) => new Date(b.matchedAt) - new Date(a.matchedAt))
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
         .slice(0, 5);
 
     const stats = [
@@ -194,7 +199,7 @@ const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
                 })}
             </div>
 
-            {/* Recent Activity */}
+            {/* Unread Messages */}
             <div style={{
                 background: 'white',
                 margin: '8px 16px 0',
@@ -217,30 +222,31 @@ const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
                         alignItems: 'center',
                         gap: '8px'
                     }}>
-                        <Clock size={20} color="#007AFF" />
-                        最近のアクティビティ
+                        <MessageCircle size={20} color="#007AFF" />
+                        未読メッセージ
                     </h2>
                 </div>
 
-                {recentActivity.length > 0 ? (
+                {unreadMessagesList.length > 0 ? (
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '12px'
                     }}>
-                        {recentActivity.map((user, index) => (
+                        {unreadMessagesList.map((msg, index) => (
                             <div
-                                key={user.id}
-                                onMouseEnter={() => setHoveredCard(`activity-${user.id}`)}
+                                key={`${msg.user.id}-${index}`}
+                                onMouseEnter={() => setHoveredCard(`message-${msg.user.id}-${index}`)}
                                 onMouseLeave={() => setHoveredCard(null)}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '12px',
                                     padding: '12px',
-                                    background: '#F8F8F8',
+                                    background: '#FFF4E5',
                                     borderRadius: '8px',
-                                    transform: hoveredCard === `activity-${user.id}` ? 'translateX(4px)' : 'translateX(0)',
+                                    border: '1px solid #FFE5CC',
+                                    transform: hoveredCard === `message-${msg.user.id}-${index}` ? 'translateX(4px)' : 'translateX(0)',
                                     transition: 'all 0.3s ease'
                                 }}
                             >
@@ -257,21 +263,23 @@ const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
                                 }}>
                                     👤
                                 </div>
-                                <div style={{ flex: 1 }}>
+                                <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{
                                         fontSize: '14px',
                                         fontWeight: '600',
                                         color: '#333',
                                         marginBottom: '4px'
                                     }}>
-                                        {user.name}
+                                        {msg.user.hasProfileAccess ? msg.user.name : '新規マッチング'}
                                     </div>
                                     <div style={{
                                         fontSize: '12px',
-                                        color: '#666'
+                                        color: '#666',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
                                     }}>
-                                        <Heart size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} color="#FF3B30" />
-                                        ピックされました
+                                        {msg.type === 'text' ? msg.text : msg.type === 'image' ? '📷 画像' : '📄 ファイル'}
                                     </div>
                                 </div>
                                 <div style={{
@@ -279,7 +287,7 @@ const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
                                     color: '#999',
                                     whiteSpace: 'nowrap'
                                 }}>
-                                    {formatDate(user.matchedAt)}
+                                    {formatDate(msg.timestamp)}
                                 </div>
                             </div>
                         ))}
@@ -290,84 +298,12 @@ const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
                         padding: '40px 20px',
                         color: '#999'
                     }}>
-                        <Calendar size={48} color="#CCC" style={{ marginBottom: '12px' }} />
+                        <MessageCircle size={48} color="#CCC" style={{ marginBottom: '12px' }} />
                         <p style={{ margin: 0, fontSize: '14px' }}>
-                            最近のアクティビティはありません
+                            未読メッセージはありません
                         </p>
                     </div>
                 )}
-            </div>
-
-            {/* Quick Actions */}
-            <div style={{
-                background: 'white',
-                margin: '8px 16px 0',
-                borderRadius: '12px',
-                padding: '20px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-            }}>
-                <h2 style={{
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    color: '#333',
-                    margin: '0 0 16px 0'
-                }}>
-                    クイックアクション
-                </h2>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: '12px'
-                }}>
-                    <button
-                        onMouseEnter={() => setHoveredCard('action-messages')}
-                        onMouseLeave={() => setHoveredCard(null)}
-                        style={{
-                            background: hoveredCard === 'action-messages' ? '#0051CC' : '#007AFF',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '16px',
-                            fontSize: '14px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            transition: 'all 0.3s ease',
-                            transform: hoveredCard === 'action-messages' ? 'translateY(-2px)' : 'translateY(0)',
-                            boxShadow: hoveredCard === 'action-messages' ? '0 4px 12px rgba(0,122,255,0.3)' : 'none'
-                        }}
-                    >
-                        <MessageCircle size={18} />
-                        メッセージ確認
-                    </button>
-                    <button
-                        onMouseEnter={() => setHoveredCard('action-users')}
-                        onMouseLeave={() => setHoveredCard(null)}
-                        style={{
-                            background: hoveredCard === 'action-users' ? '#2BA84A' : '#34C759',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '16px',
-                            fontSize: '14px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            transition: 'all 0.3s ease',
-                            transform: hoveredCard === 'action-users' ? 'translateY(-2px)' : 'translateY(0)',
-                            boxShadow: hoveredCard === 'action-users' ? '0 4px 12px rgba(52,199,89,0.3)' : 'none'
-                        }}
-                    >
-                        <Users size={18} />
-                        ユーザー管理
-                    </button>
-                </div>
             </div>
         </div>
     );

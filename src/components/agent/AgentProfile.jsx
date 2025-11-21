@@ -6,7 +6,6 @@ const AgentProfile = ({ agentData, onSave }) => {
     const [editData, setEditData] = useState({ ...agentData });
     const [hoveredItem, setHoveredItem] = useState(null);
     const photoInputRef = useRef(null);
-    const certInputRef = useRef(null);
 
     const handleSave = () => {
         onSave(editData);
@@ -74,31 +73,7 @@ const AgentProfile = ({ agentData, onSave }) => {
         }));
     };
 
-    const handleAddCertification = () => {
-        if (certInputRef.current) {
-            certInputRef.current.click();
-        }
-    };
 
-    const handleCertificationUpload = (e) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setEditData(prev => ({
-                ...prev,
-                certifications: [...(prev.certifications || []), {
-                    name: file.name,
-                    uploadedAt: new Date().toISOString()
-                }]
-            }));
-        }
-    };
-
-    const handleRemoveCertification = (index) => {
-        setEditData(prev => ({
-            ...prev,
-            certifications: prev.certifications.filter((_, i) => i !== index)
-        }));
-    };
 
     return (
         <div style={{
@@ -595,6 +570,277 @@ const AgentProfile = ({ agentData, onSave }) => {
                 </div>
             </div>
 
+            {/* Summary */}
+            <div style={{
+                background: 'white',
+                margin: '0 16px 16px',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            }}>
+                <h3 style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#333',
+                    margin: '0 0 16px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}>
+                    <FileText size={18} color="#007AFF" />
+                    概要文
+                </h3>
+                {isEditing ? (
+                    <textarea
+                        value={editData.summary || ''}
+                        onChange={(e) => setEditData(prev => ({ ...prev, summary: e.target.value }))}
+                        placeholder="概要文を入力してください"
+                        style={{
+                            width: '100%',
+                            minHeight: '100px',
+                            padding: '12px',
+                            border: '1px solid #E5E5E5',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            lineHeight: '1.6',
+                            outline: 'none',
+                            resize: 'vertical',
+                            fontFamily: 'inherit'
+                        }}
+                    />
+                ) : (
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#333',
+                        lineHeight: '1.6',
+                        margin: 0,
+                        whiteSpace: 'pre-wrap'
+                    }}>
+                        {editData.summary || '概要文が設定されていません'}
+                    </p>
+                )}
+            </div>
+
+            {/* Personal Details */}
+            <div style={{
+                background: 'white',
+                margin: '0 16px 16px',
+                borderRadius: '12px',
+                padding: '20px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            }}>
+                <h3 style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#333',
+                    margin: '0 0 16px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}>
+                    <Briefcase size={18} color="#007AFF" />
+                    詳細情報
+                </h3>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                            <label style={{
+                                fontSize: '13px',
+                                color: '#666',
+                                marginBottom: '8px',
+                                display: 'block'
+                            }}>
+                                年齢
+                            </label>
+                            {isEditing ? (
+                                <input
+                                    type="number"
+                                    value={editData.age || ''}
+                                    onChange={(e) => setEditData(prev => ({ ...prev, age: e.target.value }))}
+                                    placeholder="年齢"
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 12px',
+                                        border: '1px solid #E5E5E5',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        outline: 'none'
+                                    }}
+                                />
+                            ) : (
+                                <div style={{ fontSize: '14px', color: '#333' }}>
+                                    {editData.age ? `${editData.age}歳` : '未設定'}
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <label style={{
+                                fontSize: '13px',
+                                color: '#666',
+                                marginBottom: '8px',
+                                display: 'block'
+                            }}>
+                                性別
+                            </label>
+                            {isEditing ? (
+                                <select
+                                    value={editData.gender || ''}
+                                    onChange={(e) => setEditData(prev => ({ ...prev, gender: e.target.value }))}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 12px',
+                                        border: '1px solid #E5E5E5',
+                                        borderRadius: '8px',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                        background: 'white'
+                                    }}
+                                >
+                                    <option value="">選択してください</option>
+                                    <option value="男性">男性</option>
+                                    <option value="女性">女性</option>
+                                    <option value="その他">その他</option>
+                                </select>
+                            ) : (
+                                <div style={{ fontSize: '14px', color: '#333' }}>
+                                    {editData.gender || '未設定'}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '8px',
+                            display: 'block'
+                        }}>
+                            得意な企業タイプ
+                        </label>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={editData.specialtyCompanyType || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, specialtyCompanyType: e.target.value }))}
+                                placeholder="例：スタートアップ、大手企業、外資系など"
+                                style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #E5E5E5',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    outline: 'none'
+                                }}
+                            />
+                        ) : (
+                            <div style={{ fontSize: '14px', color: '#333' }}>
+                                {editData.specialtyCompanyType || '未設定'}
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '8px',
+                            display: 'block'
+                        }}>
+                            得意な地域
+                        </label>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={editData.specialtyRegion || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, specialtyRegion: e.target.value }))}
+                                placeholder="例：東京都、関東圏、全国など"
+                                style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #E5E5E5',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    outline: 'none'
+                                }}
+                            />
+                        ) : (
+                            <div style={{ fontSize: '14px', color: '#333' }}>
+                                {editData.specialtyRegion || '未設定'}
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '8px',
+                            display: 'block'
+                        }}>
+                            初回の面談方法
+                        </label>
+                        {isEditing ? (
+                            <select
+                                value={editData.initialMeetingMethod || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, initialMeetingMethod: e.target.value }))}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #E5E5E5',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    outline: 'none',
+                                    background: 'white'
+                                }}
+                            >
+                                <option value="">選択してください</option>
+                                <option value="対面">対面</option>
+                                <option value="オンライン">オンライン</option>
+                                <option value="対面・オンライン両方可能">対面・オンライン両方可能</option>
+                            </select>
+                        ) : (
+                            <div style={{ fontSize: '14px', color: '#333' }}>
+                                {editData.initialMeetingMethod || '未設定'}
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '8px',
+                            display: 'block'
+                        }}>
+                            得意な採用カテゴリ
+                        </label>
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={editData.specialtyCategory || ''}
+                                onChange={(e) => setEditData(prev => ({ ...prev, specialtyCategory: e.target.value }))}
+                                placeholder="例：エンジニア、営業、マーケティングなど"
+                                style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: '1px solid #E5E5E5',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    outline: 'none'
+                                }}
+                            />
+                        ) : (
+                            <div style={{ fontSize: '14px', color: '#333' }}>
+                                {editData.specialtyCategory || '未設定'}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
             {/* Bio */}
             <div style={{
                 background: 'white',
@@ -670,7 +916,7 @@ const AgentProfile = ({ agentData, onSave }) => {
                         gap: '8px'
                     }}>
                         <Award size={18} color="#007AFF" />
-                        実績・経験
+                        実績と対応の特徴
                     </h3>
                     {isEditing && (
                         <button
@@ -753,10 +999,10 @@ const AgentProfile = ({ agentData, onSave }) => {
                                     <textarea
                                         value={achievement.description}
                                         onChange={(e) => handleAchievementChange(index, 'description', e.target.value)}
-                                        placeholder="詳細説明"
+                                        placeholder="対応の特徴や実績の詳細を入力してください"
                                         style={{
                                             width: '100%',
-                                            minHeight: '60px',
+                                            minHeight: '100px',
                                             padding: '8px 12px',
                                             border: '1px solid #E5E5E5',
                                             borderRadius: '6px',
@@ -796,146 +1042,13 @@ const AgentProfile = ({ agentData, onSave }) => {
                             textAlign: 'center',
                             margin: '20px 0'
                         }}>
-                            実績・経験が登録されていません
+                            実績と対応の特徴が登録されていません
                         </p>
                     )}
                 </div>
             </div>
 
-            {/* Certifications */}
-            <div style={{
-                background: 'white',
-                margin: '0 16px 16px',
-                borderRadius: '12px',
-                padding: '20px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-            }}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '16px'
-                }}>
-                    <h3 style={{
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        color: '#333',
-                        margin: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}>
-                        <FileText size={18} color="#007AFF" />
-                        資格・認定証
-                    </h3>
-                    {isEditing && (
-                        <button
-                            onClick={handleAddCertification}
-                            onMouseEnter={() => setHoveredItem('add-cert')}
-                            onMouseLeave={() => setHoveredItem(null)}
-                            style={{
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                border: 'none',
-                                background: hoveredItem === 'add-cert' ? '#E5F1FF' : 'transparent',
-                                color: '#007AFF',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                transition: 'all 0.2s ease'
-                            }}
-                        >
-                            <Plus size={14} />
-                            アップロード
-                        </button>
-                    )}
-                    <input
-                        ref={certInputRef}
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={handleCertificationUpload}
-                        style={{ display: 'none' }}
-                    />
-                </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {(editData.certifications || []).map((cert, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                padding: '12px',
-                                background: '#F8F8F8',
-                                borderRadius: '8px'
-                            }}
-                        >
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                flex: 1
-                            }}>
-                                <FileText size={20} color="#007AFF" />
-                                <div>
-                                    <div style={{
-                                        fontSize: '14px',
-                                        fontWeight: '500',
-                                        color: '#333'
-                                    }}>
-                                        {cert.name}
-                                    </div>
-                                    <div style={{
-                                        fontSize: '11px',
-                                        color: '#999',
-                                        marginTop: '2px'
-                                    }}>
-                                        {new Date(cert.uploadedAt).toLocaleDateString('ja-JP')}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {isEditing && (
-                                <button
-                                    onClick={() => handleRemoveCertification(index)}
-                                    onMouseEnter={() => setHoveredItem(`del-cert-${index}`)}
-                                    onMouseLeave={() => setHoveredItem(null)}
-                                    style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '50%',
-                                        border: 'none',
-                                        background: hoveredItem === `del-cert-${index}` ? '#FF3B30' : '#FFE5E5',
-                                        color: hoveredItem === `del-cert-${index}` ? 'white' : '#FF3B30',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                >
-                                    <Trash2 size={14} />
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                    
-                    {(!editData.certifications || editData.certifications.length === 0) && (
-                        <p style={{
-                            fontSize: '14px',
-                            color: '#999',
-                            textAlign: 'center',
-                            margin: '20px 0'
-                        }}>
-                            資格・認定証がアップロードされていません
-                        </p>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };
