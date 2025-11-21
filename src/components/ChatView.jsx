@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Paperclip, Image as ImageIcon, Send } from 'lucide-react';
 
-const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
+const ChatView = ({ agent, onBack, messages, onSendMessage, onViewAgentProfile }) => {
     const [inputText, setInputText] = useState('');
     const [unreadCount] = useState(2); // For demonstration
     const [hoveredIcon, setHoveredIcon] = useState(null);
@@ -103,7 +103,27 @@ const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
                     </div>
                 )}
 
-                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>{agent.name}</span>
+                <span style={{ fontSize: '16px', fontWeight: 'bold', flex: 1 }}>{agent.name}</span>
+
+                {/* Profile Button */}
+                <button
+                    onClick={() => onViewAgentProfile && onViewAgentProfile(agent)}
+                    onMouseEnter={() => setHoveredIcon('profile')}
+                    onMouseLeave={() => setHoveredIcon(null)}
+                    style={{
+                        background: hoveredIcon === 'profile' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.2)',
+                        color: 'white',
+                        border: '1px solid rgba(255,255,255,0.5)',
+                        borderRadius: '6px',
+                        padding: '6px 12px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                    }}
+                >
+                    プロフィール
+                </button>
             </div>
 
             {/* Messages Area */}

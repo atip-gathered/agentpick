@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
-const FeaturedArticlesPage = ({ onNavigateToDetail }) => {
+const FeaturedArticlesPage = ({ onNavigateToDetail, onNavigateToSwipe }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [hoveredCard, setHoveredCard] = useState(null);
+    const [hoveredButton, setHoveredButton] = useState(false);
     const totalPages = 12;
     const articlesPerPage = 5;
 
@@ -506,10 +507,13 @@ const FeaturedArticlesPage = ({ onNavigateToDetail }) => {
                     }}
                 />
                 <button
+                    onClick={() => onNavigateToSwipe && onNavigateToSwipe()}
+                    onMouseEnter={() => setHoveredButton(true)}
+                    onMouseLeave={() => setHoveredButton(false)}
                     style={{
                         width: '100%',
                         maxWidth: '280px',
-                        background: '#FF9500',
+                        background: hoveredButton ? '#FF8800' : '#FF9500',
                         color: 'white',
                         border: 'none',
                         padding: '14px 24px',
@@ -517,7 +521,9 @@ const FeaturedArticlesPage = ({ onNavigateToDetail }) => {
                         fontSize: '15px',
                         fontWeight: 'bold',
                         cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                        boxShadow: hoveredButton ? '0 4px 12px rgba(255,149,0,0.4)' : '0 2px 8px rgba(0,0,0,0.15)',
+                        transform: hoveredButton ? 'translateY(-2px)' : 'translateY(0)',
+                        transition: 'all 0.3s ease'
                     }}
                 >
                     エージェントをピックする
