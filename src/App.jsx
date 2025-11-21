@@ -27,6 +27,7 @@ import AgentForgotPasswordPage from './components/agent/AgentForgotPasswordPage'
 import AdminLoginPage from './components/admin/AdminLoginPage';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './components/admin/AdminDashboard';
+import AdminArticles from './components/admin/AdminArticles';
 import { agents } from './mockData';
 
 function App() {
@@ -63,6 +64,131 @@ function App() {
         notifications: 8
     });
     
+    // Admin Articles State
+    const [adminArticles, setAdminArticles] = useState([
+        {
+            id: 1,
+            title: '年間MVP受賞！山田明子の転職支援ストーリー',
+            description: 'パーソルキャリアで支社長を務める山田明子さん。彼女の転職支援における情熱と実績に迫ります。',
+            content: 'IT業界での転職支援において、圧倒的な実績を誇る山田明子さん。2023年度の年間MVPを受賞した彼女の転職支援の秘訣とは何でしょうか。',
+            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            tag: 'インタビュー',
+            author: '編集部',
+            date: '2024.12.15',
+            isPublished: true,
+            views: 1234,
+            createdAt: new Date('2024-12-15').toISOString(),
+            featuredAgentId: 1,
+            tableOfContents: [
+                '転職エージェントになったきっかけ',
+                '支社長として目指すもの',
+                '後輩エージェントへのメッセージ',
+                'プライベートとの両立'
+            ],
+            sections: [
+                {
+                    title: '転職エージェントになったきっかけ',
+                    content: '大学卒業後、人材業界とは全く縁のない金融業界でキャリアをスタートしました。お客様の資産運用のサポートをする中で、「人生の転機に寄り添い、サポートする」という仕事の面白さに気づいたんです。そこから転職支援の道に興味を持ち、25歳の時に人材サービス会社に転職しました。\n\n最初は営業として企業の採用支援に携わっていましたが、次第に求職者の方々と直接向き合う仕事がしたいと思うようになり、転職エージェントとしてのキャリアをスタートさせました。今振り返ると、自分自身が転職という大きな決断をした経験が、この仕事への情熱につながっているのだと感じます。'
+                },
+                {
+                    title: '支社長として目指すもの',
+                    content: '支社長として最も大切にしているのは、「チーム全体の成長」です。一人ひとりのエージェントが自信を持って求職者の方々をサポートできる環境を作ることが、私の使命だと考えています。\n\n具体的には、定期的な1on1ミーティングを通じて各メンバーの強みを伸ばし、課題を一緒に解決していくことを心がけています。また、成功事例を共有する文化を醸成し、お互いに学び合える組織づくりにも力を入れています。\n\n私たちの仕事は、人の人生に大きな影響を与える責任ある仕事です。だからこそ、エージェント一人ひとりが高い専門性と誠実さを持って求職者に向き合える、そんなチームを作っていきたいと思っています。'
+                },
+                {
+                    title: '後輩エージェントへのメッセージ',
+                    content: '転職エージェントとして働き始めた頃は、誰もが不安を感じるものです。私もそうでした。でも、大切なのは「求職者の人生に真摯に向き合う」という気持ちを忘れないことです。\n\n最初はうまく話せなかったり、適切なアドバイスができなかったりすることもあるかもしれません。でも、その経験一つひとつが必ず成長につながります。失敗を恐れず、常に学び続ける姿勢を持ち続けてください。\n\nそして、困った時は一人で抱え込まず、チームのメンバーや先輩に相談してください。私たちは一つのチームです。一緒に成長していきましょう。'
+                },
+                {
+                    title: 'プライベートとの両立',
+                    content: '正直に言うと、仕事とプライベートの両立は簡単ではありません。特に支社長という立場になってからは、責任も増え、時間のやりくりに苦労することもあります。\n\nでも、だからこそ意識的にメリハリをつけることを大切にしています。休日は家族との時間を最優先にし、趣味のヨガでリフレッシュする時間も確保するようにしています。オンとオフを切り替えることで、仕事でのパフォーマンスも向上すると実感しています。\n\nまた、チームメンバーにも同じことを伝えています。長時間働くことが良いことではなく、効率的に働き、自分の時間も大切にすることが、結果的に良い仕事につながると信じています。'
+                }
+            ]
+        },
+        {
+            id: 2,
+            title: 'IT業界への転職を成功させる5つのステップ',
+            description: '未経験からIT業界へ転職を目指す方に向けて、成功のための具体的なステップを解説します。',
+            content: 'IT業界への転職を考えている方へ。未経験からでも成功できる5つのステップをご紹介します。',
+            image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            tag: 'ガイド',
+            author: '佐藤 健太',
+            date: '2024.12.10',
+            isPublished: true,
+            views: 892,
+            createdAt: new Date('2024-12-10').toISOString(),
+            featuredAgentId: null,
+            tableOfContents: ['基礎知識の習得', 'ポートフォリオの作成', '業界研究', '職務経歴書の最適化', 'エージェントの活用'],
+            sections: [
+                { title: '基礎知識の習得', content: 'プログラミングの基礎やIT用語について学びましょう。オンライン学習サービスを活用するのがおすすめです。無料で学べるプラットフォームも多数あります。' },
+                { title: 'ポートフォリオの作成', content: '学んだ知識を活かして、簡単なWebサイトやアプリを作成してみましょう。実際に動くものを作ることで、面接でのアピール材料になります。' },
+                { title: '業界研究', content: 'IT業界の動向や求められるスキルについて調査しましょう。最新のトレンドを把握することで、適切なキャリアプランが立てられます。' },
+                { title: '職務経歴書の最適化', content: 'これまでの経験をIT業界でどう活かせるか、明確に記載しましょう。異業種からの転職でも、マネジメント経験やコミュニケーション能力は評価されます。' },
+                { title: 'エージェントの活用', content: '専門のエージェントに相談することで、効率的な転職活動が可能になります。業界知識や企業とのコネクションを活用できます。' }
+            ]
+        },
+        {
+            id: 3,
+            title: '2024年 転職市場の最新トレンド',
+            description: '2024年の転職市場における注目のトレンドと、求職者が知っておくべきポイントをまとめました。',
+            content: '2024年の転職市場は、リモートワークの定着やDXの加速により、大きく変化しています。',
+            image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            tag: 'ニュース',
+            author: '編集部',
+            date: '2024.12.05',
+            isPublished: true,
+            views: 1567,
+            createdAt: new Date('2024-12-05').toISOString(),
+            featuredAgentId: null,
+            tableOfContents: ['ハイブリッドワークの普及', 'DX人材の需要増加', 'ウェルビーイング重視の企業文化'],
+            sections: [
+                { title: 'ハイブリッドワークの普及', content: 'リモートワークとオフィスワークを組み合わせたハイブリッドワークが、多くの企業で標準となっています。柔軟な働き方が求められる時代です。' },
+                { title: 'DX人材の需要増加', content: 'データサイエンティスト、AIエンジニア、プロダクトマネージャーなどのDX関連職種で、引き続き高い需要が見込まれています。' },
+                { title: 'ウェルビーイング重視の企業文化', content: '従業員の健康と幸福を重視する企業が増加。ワークライフバランスや心理的安全性が重要な評価基準になっています。' }
+            ]
+        },
+        {
+            id: 4,
+            title: '面接で差をつける！効果的な自己PRの作り方',
+            description: '採用担当者の心をつかむ自己PRの作り方を、具体例とともに解説します。',
+            content: '面接で最も重要な自己PR。効果的な自己PRを作るためのポイントをご紹介します。',
+            image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            tag: 'コラム',
+            author: '田中 美咲',
+            date: '2024.11.28',
+            isPublished: true,
+            views: 743,
+            createdAt: new Date('2024-11-28').toISOString(),
+            featuredAgentId: null,
+            tableOfContents: ['強みの明確化', '企業ニーズとの結びつけ', 'ストーリー化', '簡潔にまとめる'],
+            sections: [
+                { title: '強みの明確化', content: 'まずは自分の強みを3つ挙げてみましょう。具体的なエピソードと共に説明できることが重要です。抽象的な表現ではなく、実際の経験に基づいた強みを挙げることがポイントです。' },
+                { title: '企業ニーズとの結びつけ', content: '応募企業が求めている人物像と、自分の強みをどう結びつけるか考えます。企業研究をしっかり行い、求められるスキルや価値観を理解しましょう。' },
+                { title: 'ストーリー化', content: 'STAR法（Situation, Task, Action, Result）を使って、説得力のあるストーリーを作りましょう。状況、課題、行動、結果を明確に伝えることで、採用担当者に具体的なイメージを持ってもらえます。' },
+                { title: '簡潔にまとめる', content: '1分程度で話せる長さにまとめることが大切です。長すぎると要点がぼやけ、短すぎると印象に残りません。何度も練習して、自然に話せるようにしましょう。' }
+            ]
+        },
+        {
+            id: 5,
+            title: '転職フェア2025 開催のお知らせ',
+            description: '来年2月に開催される転職フェアの詳細情報をお届けします。参加企業100社以上！',
+            content: '2025年2月に開催される大規模転職フェアのお知らせです。',
+            image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+            tag: 'イベント',
+            author: '編集部',
+            date: '2024.11.20',
+            isPublished: false,
+            views: 456,
+            createdAt: new Date('2024-11-20').toISOString(),
+            featuredAgentId: null,
+            tableOfContents: ['イベント概要', '参加企業ジャンル', '事前登録について'],
+            sections: [
+                { title: 'イベント概要', content: '日時：2025年2月15日（土）10:00-18:00\n場所：東京ビッグサイト\n\n参加企業：100社以上\n参加費：無料（事前登録制）\n\n当日は企業ブースでの説明会に加え、転職セミナーや個別相談会も開催予定です。' },
+                { title: '参加企業ジャンル', content: 'IT・Web系企業、コンサルティングファーム、メーカー、金融機関、スタートアップ企業など、多様な業界から100社以上が参加予定です。あなたに合った企業がきっと見つかります。' },
+                { title: '事前登録について', content: '事前登録は12月20日より開始します。詳細は公式サイトをご確認ください。事前登録者には当日の特典もご用意しております。' }
+            ]
+        }
+    ]);
+    
     // Child Agent Management Handlers
     const handleCreateChildAgent = (childData) => {
         const newChild = {
@@ -85,6 +211,25 @@ function App() {
 
     const handleDeleteChildAgent = (childId) => {
         setChildAgents(prev => prev.filter(child => child.id !== childId));
+    };
+    
+    // Admin Article Management Handlers
+    const handleCreateArticle = (articleData) => {
+        setAdminArticles(prev => [articleData, ...prev]);
+        setAdminStats(prev => ({ ...prev, articles: prev.articles + 1 }));
+    };
+    
+    const handleUpdateArticle = (articleId, updatedData) => {
+        setAdminArticles(prev => 
+            prev.map(article => 
+                article.id === articleId ? updatedData : article
+            )
+        );
+    };
+    
+    const handleDeleteArticle = (articleId) => {
+        setAdminArticles(prev => prev.filter(article => article.id !== articleId));
+        setAdminStats(prev => ({ ...prev, articles: prev.articles - 1 }));
     };
 
     const handleAssignUserToChild = (userId, childId) => {
@@ -321,6 +466,7 @@ function App() {
                     onRegisterClick={() => setCurrentView('register')}
                     onMenuClick={() => setIsMenuOpen(true)}
                     onNavigate={handleBottomNavigation}
+                    isLoggedIn={isLoggedIn}
                 >
                     {currentView === 'swipe' && (
                         <>
@@ -370,18 +516,12 @@ function App() {
                                 setTimeout(() => setSwipeCommand('right'), 100);
                             }}
                             onNavigateToArticle={(articleId) => {
-                                // Find the article by ID from FeaturedArticlesPage's mock data
-                                // For now, we'll navigate to articles page and set the selected article
-                                setCurrentView('article-detail');
-                                // Mock article data (in production, this would come from a data source)
-                                setSelectedArticle({
-                                    id: articleId,
-                                    title: "年間MVP受賞！山田明子の転職支援ストーリー",
-                                    description: "パーソルキャリアで支社長を務める山田明子さん。彼女の転職支援における情熱と実績に迫ります。",
-                                    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                                    date: "2024.12.15",
-                                    tag: "インタビュー"
-                                });
+                                // Find the article by ID from adminArticles
+                                const article = adminArticles.find(a => a.id === articleId);
+                                if (article) {
+                                    setSelectedArticle(article);
+                                    setCurrentView('article-detail');
+                                }
                             }}
                         />
                     )}
@@ -441,10 +581,12 @@ function App() {
 
                     {currentView === 'articles' && (
                         <FeaturedArticlesPage 
+                            articles={adminArticles.filter(a => a.isPublished)}
                             onNavigateToDetail={(article) => {
                                 setSelectedArticle(article);
                                 setCurrentView('article-detail');
                             }}
+                            onNavigateToSwipe={() => setCurrentView('swipe')}
                         />
                     )}
 
@@ -638,10 +780,12 @@ function App() {
                     )}
                     
                     {adminActiveTab === 'articles' && (
-                        <div style={{ padding: '20px', textAlign: 'center' }}>
-                            <h2>特集記事管理</h2>
-                            <p>開発中...</p>
-                        </div>
+                        <AdminArticles 
+                            articles={adminArticles}
+                            onCreateArticle={handleCreateArticle}
+                            onUpdateArticle={handleUpdateArticle}
+                            onDeleteArticle={handleDeleteArticle}
+                        />
                     )}
                     
                     {adminActiveTab === 'agents' && (

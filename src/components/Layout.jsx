@@ -2,7 +2,7 @@ import React from 'react';
 import Header from './Header';
 import BottomNav from './BottomNav';
 
-const Layout = ({ children, activeTab, onLogoClick, onRegisterClick, onMenuClick, onNavigate }) => {
+const Layout = ({ children, activeTab, onLogoClick, onRegisterClick, onMenuClick, onNavigate, isLoggedIn }) => {
     return (
         <div style={{
             width: '100%',
@@ -12,7 +12,12 @@ const Layout = ({ children, activeTab, onLogoClick, onRegisterClick, onMenuClick
             background: '#F2F2F7', // Light gray background
             position: 'relative'
         }}>
-            <Header onLogoClick={onLogoClick} onRegisterClick={onRegisterClick} onMenuClick={onMenuClick} />
+            <Header 
+                onLogoClick={onLogoClick} 
+                onRegisterClick={onRegisterClick} 
+                onMenuClick={onMenuClick}
+                isLoggedIn={isLoggedIn}
+            />
             <main style={{
                 flex: 1,
                 overflow: 'hidden',
@@ -20,7 +25,11 @@ const Layout = ({ children, activeTab, onLogoClick, onRegisterClick, onMenuClick
             }}>
                 {children}
             </main>
-            <BottomNav activeTab={activeTab} onNavigate={onNavigate} />
+            <BottomNav 
+                activeTab={activeTab} 
+                onNavigate={onNavigate}
+                isLoggedIn={isLoggedIn}
+            />
         </div>
     );
 };

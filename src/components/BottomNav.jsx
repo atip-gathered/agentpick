@@ -1,15 +1,26 @@
 import React, { useState } from 'react';
 import { ThumbsUp, Search, MessageCircle, BookOpen, User } from 'lucide-react';
 
-const BottomNav = ({ activeTab, onNavigate }) => {
+const BottomNav = ({ activeTab, onNavigate, isLoggedIn }) => {
     const [hoveredTab, setHoveredTab] = useState(null);
-    const tabs = [
+    
+    // 未ログイン時は3つのタブのみ表示
+    const guestTabs = [
+        { id: 'swipe', icon: ThumbsUp, label: 'ピック' },
+        { id: 'search', icon: Search, label: '探す' },
+        { id: 'detail', icon: BookOpen, label: '特集記事' }
+    ];
+    
+    // ログイン後は全5つのタブを表示
+    const loggedInTabs = [
         { id: 'swipe', icon: ThumbsUp, label: 'ピック' },
         { id: 'search', icon: Search, label: '探す' },
         { id: 'messages', icon: MessageCircle, label: 'メッセージ' },
         { id: 'detail', icon: BookOpen, label: '特集記事' },
         { id: 'profile', icon: User, label: 'マイページ' }
     ];
+    
+    const tabs = isLoggedIn ? loggedInTabs : guestTabs;
 
     return (
         <nav style={{
