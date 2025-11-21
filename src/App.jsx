@@ -36,6 +36,7 @@ import CreateParentAgentModal from './components/admin/CreateParentAgentModal';
 import EditParentAgentModal from './components/admin/EditParentAgentModal';
 import AdminApprovals from './components/admin/AdminApprovals';
 import AdminApprovalDetail from './components/admin/AdminApprovalDetail';
+import RegistrationPromptModal from './components/RegistrationPromptModal';
 import { agents } from './mockData';
 
 function App() {
@@ -47,6 +48,10 @@ function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [messages, setMessages] = useState({}); // Store messages by agent ID
     const [currentChatAgent, setCurrentChatAgent] = useState(null);
+    
+    // Registration Prompt Modal State
+    const [showRegistrationPrompt, setShowRegistrationPrompt] = useState(false);
+    const [guestSwipeCount, setGuestSwipeCount] = useState(0);
 
     // Navigation State
     const [currentView, setCurrentView] = useState('landing'); // 'landing', 'swipe', 'detail', 'completion', 'login', 'register', 'messages', 'chat', 'search', 'articles', 'article-detail', 'agent-login', 'agent-dashboard'
@@ -649,12 +654,35 @@ function App() {
 
     const handleSwipe = (direction, agent) => {
         console.log(`Swiped ${direction} on ${agent.name} `);
+        
+        // Track swipe count for guest users (not logged in)
+        if (!isLoggedIn) {
+            const newCount = guestSwipeCount + 1;
+            setGuestSwipeCount(newCount);
+            
+            // Show registration prompt after 3 swipes
+            if (newCount === 3) {
+                setShowRegistrationPrompt(true);
+            }
+        }
     };
 
     const handleMatch = (agent) => {
         setMatchAgent(agent); // Keep this for reference
         // Removed: setIsModalOpen(true);
         setMatchedAgents(prev => [...prev, agent.id]);
+    };
+    
+    // Handle pick agent from search page (for guest users)
+    const handlePickAgentFromSearch = (agent) => {
+        if (!isLoggedIn) {
+            // Show registration prompt immediately for search picks
+            setShowRegistrationPrompt(true);
+        } else {
+            // If logged in, proceed with normal pick behavior
+            handleMatch(agent);
+            setSwipeCommand('right');
+        }
     };
 
     const handleSendMessage = (agentId, text, type = 'text', sender = 'user') => {
@@ -892,6 +920,7 @@ function App() {
                         <LoginPage
                             onLogin={() => {
                                 setIsLoggedIn(true);
+                                setGuestSwipeCount(0);
                                 setCurrentView('swipe');
                             }}
                             onNavigateToRegister={() => setCurrentView('register')}
@@ -900,7 +929,11 @@ function App() {
 
                     {currentView === 'register' && (
                         <RegisterPage
-                            onRegister={() => setCurrentView('swipe')}
+                            onRegister={() => {
+                                setIsLoggedIn(true);
+                                setGuestSwipeCount(0);
+                                setCurrentView('swipe');
+                            }}
                             onNavigateToLogin={() => setCurrentView('login')}
                         />
                     )}
@@ -923,10 +956,7 @@ function App() {
                         <SearchPage
                             agents={agents}
                             matchedAgents={matchedAgents}
-                            onPickAgent={(agent) => {
-                                handleMatch(agent);
-                                setSwipeCommand('right');
-                            }}
+                            onPickAgent={handlePickAgentFromSearch}
                             onNavigate={(view, agent) => {
                                 if (view === 'detail') {
                                     setSelectedAgent(agent);
@@ -1261,6 +1291,16 @@ function App() {
                     }}
                 />
             )}
+            
+            {/* Registration Prompt Modal */}
+            <RegistrationPromptModal
+                isOpen={showRegistrationPrompt}
+                onClose={() => setShowRegistrationPrompt(false)}
+                onRegister={() => {
+                    setShowRegistrationPrompt(false);
+                    setCurrentView('register');
+                }}
+            />
         </>
     );
 }
