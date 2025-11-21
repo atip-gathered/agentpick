@@ -28,6 +28,14 @@ import AdminLoginPage from './components/admin/AdminLoginPage';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminArticles from './components/admin/AdminArticles';
+import AdminAgents from './components/admin/AdminAgents';
+import AdminAgentDetail from './components/admin/AdminAgentDetail';
+import AdminChildAccountDetail from './components/admin/AdminChildAccountDetail';
+import CreateChildAccountModal from './components/admin/CreateChildAccountModal';
+import CreateParentAgentModal from './components/admin/CreateParentAgentModal';
+import EditParentAgentModal from './components/admin/EditParentAgentModal';
+import AdminApprovals from './components/admin/AdminApprovals';
+import AdminApprovalDetail from './components/admin/AdminApprovalDetail';
 import { agents } from './mockData';
 
 function App() {
@@ -57,12 +65,88 @@ function App() {
     const [isAdminMode, setIsAdminMode] = useState(false);
     const [adminData, setAdminData] = useState(null);
     const [adminActiveTab, setAdminActiveTab] = useState('dashboard');
+    const [adminAgentView, setAdminAgentView] = useState('list'); // 'list', 'detail', 'child-detail'
+    const [selectedCompanyAccount, setSelectedCompanyAccount] = useState(null);
+    const [selectedAgentAccount, setSelectedAgentAccount] = useState(null);
+    const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
+    const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
+    const [showEditCompanyModal, setShowEditCompanyModal] = useState(false);
     const [adminStats, setAdminStats] = useState({
         articles: 5,
-        parentAgents: 12,
+        companyAccounts: 3,
         pendingApprovals: 3,
         notifications: 8
     });
+    
+    // Profile Change Approval Requests State
+    const [profileChangeRequests, setProfileChangeRequests] = useState([
+        {
+            id: 'request-1',
+            agentId: 'agent-1-1',
+            agentName: '田中 花子',
+            companyName: 'Atip株式会社',
+            requestedAt: new Date('2024-12-20').toISOString(),
+            status: 'pending', // 'pending', 'approved', 'rejected'
+            currentData: {
+                name: '田中 花子',
+                email: 'tanaka@atip.co.jp',
+                phone: '03-2345-6789',
+                bio: 'IT業界の転職支援を担当しています。'
+            },
+            requestedData: {
+                name: '田中 花子',
+                email: 'tanaka.hanako@atip.co.jp',
+                phone: '03-2345-6789',
+                bio: 'IT業界を中心に、Web系エンジニアの転職支援を5年以上担当しています。特にフロントエンド・バックエンドエンジニアのキャリアアップをサポートします。'
+            },
+            changedFields: ['email', 'bio']
+        },
+        {
+            id: 'request-2',
+            agentId: 'agent-2-1',
+            agentName: '鈴木 一郎',
+            companyName: '株式会社リクルート',
+            requestedAt: new Date('2024-12-19').toISOString(),
+            status: 'pending',
+            currentData: {
+                name: '鈴木 一郎',
+                email: 'suzuki@recruit.co.jp',
+                phone: '03-5678-9012',
+                bio: '営業職の転職に強みがあります。'
+            },
+            requestedData: {
+                name: '鈴木 一郎',
+                email: 'suzuki@recruit.co.jp',
+                phone: '090-1234-5678',
+                bio: '営業職・セールス職の転職支援に10年以上の実績があります。特に法人営業、インサイドセールス、フィールドセールスのポジションに強みを持っています。'
+            },
+            changedFields: ['phone', 'bio']
+        },
+        {
+            id: 'request-3',
+            agentId: 'agent-1-2',
+            agentName: '佐藤 次郎',
+            companyName: 'Atip株式会社',
+            requestedAt: new Date('2024-12-18').toISOString(),
+            status: 'pending',
+            currentData: {
+                name: '佐藤 次郎',
+                email: 'sato@atip.co.jp',
+                phone: '03-3456-7890',
+                bio: 'マーケティング職の転職支援が得意です。'
+            },
+            requestedData: {
+                name: '佐藤 次郎',
+                email: 'sato@atip.co.jp',
+                phone: '03-3456-7890',
+                bio: 'デジタルマーケティング、Webマーケティング職の転職支援が得意です。SEO、SEM、SNSマーケティング担当者のキャリア支援を行います。'
+            },
+            changedFields: ['bio']
+        }
+    ]);
+    
+    const [selectedApprovalRequest, setSelectedApprovalRequest] = useState(null);
+    const [adminApprovalView, setAdminApprovalView] = useState('list'); // 'list', 'detail'
     
     // Admin Articles State
     const [adminArticles, setAdminArticles] = useState([
@@ -189,6 +273,113 @@ function App() {
         }
     ]);
     
+    // Message Pick Statistics State (for billing)
+    // Format: { agentId: { 'YYYY-MM': count } }
+    const [messagePickStats, setMessagePickStats] = useState({
+        'agent-1-1': {
+            '2024-10': 12,
+            '2024-11': 18,
+            '2024-12': 25
+        },
+        'agent-1-2': {
+            '2024-10': 8,
+            '2024-11': 15,
+            '2024-12': 20
+        },
+        'agent-2-1': {
+            '2024-10': 22,
+            '2024-11': 28,
+            '2024-12': 35
+        }
+    });
+
+    // Admin Company Accounts State (企業アカウント)
+    const [companyAccounts, setCompanyAccounts] = useState([
+        {
+            id: 'company-1',
+            email: 'info@atip.co.jp',
+            phone: '03-1234-5678',
+            company: 'Atip株式会社',
+            location: '東京都',
+            specialty: ['IT・Web', 'コンサルティング', 'マーケティング'],
+            billingAddress: '東京都渋谷区1-2-3',
+            billingContactName: '経理 太郎',
+            image: null,
+            status: 'active',
+            createdAt: new Date('2024-01-15').toISOString(),
+            agentAccounts: [
+                {
+                    id: 'agent-1-1',
+                    name: '田中 花子',
+                    email: 'tanaka@atip.co.jp',
+                    phone: '03-2345-6789',
+                    company: 'Atip株式会社',
+                    location: '東京都',
+                    bio: 'IT業界の転職支援を担当しています。',
+                    status: 'active',
+                    isPublic: true,
+                    assignedUsers: 5,
+                    createdAt: new Date('2024-03-20').toISOString()
+                },
+                {
+                    id: 'agent-1-2',
+                    name: '佐藤 次郎',
+                    email: 'sato@atip.co.jp',
+                    phone: '03-3456-7890',
+                    company: 'Atip株式会社',
+                    location: '東京都',
+                    bio: 'マーケティング職の転職支援が得意です。',
+                    status: 'active',
+                    isPublic: false,
+                    assignedUsers: 3,
+                    createdAt: new Date('2024-05-10').toISOString()
+                }
+            ]
+        },
+        {
+            id: 'company-2',
+            email: 'info@recruit.co.jp',
+            phone: '03-4567-8901',
+            company: '株式会社リクルート',
+            location: '東京都',
+            specialty: ['営業', '事務', 'カスタマーサポート'],
+            billingAddress: '東京都千代田区4-5-6',
+            billingContactName: '財務 花子',
+            image: null,
+            status: 'active',
+            createdAt: new Date('2024-02-01').toISOString(),
+            agentAccounts: [
+                {
+                    id: 'agent-2-1',
+                    name: '鈴木 一郎',
+                    email: 'suzuki@recruit.co.jp',
+                    phone: '03-5678-9012',
+                    company: '株式会社リクルート',
+                    location: '東京都',
+                    bio: '営業職の転職に強みがあります。',
+                    status: 'active',
+                    isPublic: true,
+                    assignedUsers: 8,
+                    createdAt: new Date('2024-04-15').toISOString()
+                }
+            ]
+        },
+        {
+            id: 'company-3',
+            email: 'info@doda.jp',
+            phone: '06-1234-5678',
+            company: 'パーソルキャリア (doda)',
+            location: '大阪府',
+            specialty: ['製造', 'エンジニア', '技術職'],
+            billingAddress: '',
+            billingContactName: '',
+            image: null,
+            status: 'active',
+            createdAt: new Date('2024-01-20').toISOString(),
+            agentAccounts: []
+        }
+    ]);
+    
     // Child Agent Management Handlers
     const handleCreateChildAgent = (childData) => {
         const newChild = {
@@ -211,6 +402,173 @@ function App() {
 
     const handleDeleteChildAgent = (childId) => {
         setChildAgents(prev => prev.filter(child => child.id !== childId));
+    };
+    
+    // Admin Company Account Management Handlers
+    const handleViewCompanyDetail = (company) => {
+        setSelectedCompanyAccount(company);
+        setAdminAgentView('detail');
+    };
+    
+    const handleCreateCompanyAccount = () => {
+        setShowCreateCompanyModal(true);
+    };
+    
+    const handleCreateCompanyAccountSubmit = (newCompany) => {
+        setCompanyAccounts(prev => [...prev, newCompany]);
+        setAdminStats(prev => ({ ...prev, companyAccounts: prev.companyAccounts + 1 }));
+        setShowCreateCompanyModal(false);
+    };
+    
+    const handleEditCompanyAccount = (company) => {
+        setSelectedCompanyAccount(company);
+        setShowEditCompanyModal(true);
+    };
+    
+    const handleSaveCompanyAccount = (companyId, updatedCompany) => {
+        setCompanyAccounts(prev =>
+            prev.map(company => company.id === companyId ? updatedCompany : company)
+        );
+        setSelectedCompanyAccount(updatedCompany);
+        setShowEditCompanyModal(false);
+    };
+    
+    const handleDeleteCompanyAccount = (companyId) => {
+        setCompanyAccounts(prev => prev.filter(company => company.id !== companyId));
+        setAdminStats(prev => ({ ...prev, companyAccounts: prev.companyAccounts - 1 }));
+        setAdminAgentView('list');
+        setSelectedCompanyAccount(null);
+    };
+    
+    const handleCreateAgentAccount = (agentAccount) => {
+        setCompanyAccounts(prev =>
+            prev.map(company =>
+                company.id === selectedCompanyAccount?.id
+                    ? { ...company, agentAccounts: [...(company.agentAccounts || []), agentAccount] }
+                    : company
+            )
+        );
+        setSelectedCompanyAccount(prev => ({
+            ...prev,
+            agentAccounts: [...(prev.agentAccounts || []), agentAccount]
+        }));
+        setShowCreateAgentModal(false);
+    };
+    
+    const handleViewAgentDetail = (agentAccount) => {
+        setSelectedAgentAccount(agentAccount);
+        setAdminAgentView('agent-detail');
+    };
+    
+    const handleSaveAgentAccount = (agentId, updatedData) => {
+        setCompanyAccounts(prev =>
+            prev.map(company =>
+                company.id === selectedCompanyAccount?.id
+                    ? {
+                        ...company,
+                        agentAccounts: company.agentAccounts.map(agent =>
+                            agent.id === agentId ? updatedData : agent
+                        )
+                    }
+                    : company
+            )
+        );
+        setSelectedCompanyAccount(prev => ({
+            ...prev,
+            agentAccounts: prev.agentAccounts.map(agent =>
+                agent.id === agentId ? updatedData : agent
+            )
+        }));
+        setSelectedAgentAccount(updatedData);
+    };
+    
+    const handleDeleteAgentAccount = (agentId) => {
+        setCompanyAccounts(prev =>
+            prev.map(company =>
+                company.id === selectedCompanyAccount?.id
+                    ? {
+                        ...company,
+                        agentAccounts: company.agentAccounts.filter(agent => agent.id !== agentId)
+                    }
+                    : company
+            )
+        );
+        setSelectedCompanyAccount(prev => ({
+            ...prev,
+            agentAccounts: prev.agentAccounts.filter(agent => agent.id !== agentId)
+        }));
+        setAdminAgentView('detail');
+        setSelectedAgentAccount(null);
+    };
+    
+    // Profile Change Approval Handlers
+    const handleApproveProfileChange = (requestId) => {
+        const request = profileChangeRequests.find(r => r.id === requestId);
+        if (!request) return;
+        
+        // Find and update the actual agent account with requested data
+        setCompanyAccounts(prev =>
+            prev.map(company => ({
+                ...company,
+                agentAccounts: company.agentAccounts.map(agent =>
+                    agent.id === request.agentId
+                        ? { ...agent, ...request.requestedData }
+                        : agent
+                )
+            }))
+        );
+        
+        // Mark request as approved
+        setProfileChangeRequests(prev =>
+            prev.map(r => r.id === requestId
+                ? { ...r, status: 'approved', approvedAt: new Date().toISOString() }
+                : r
+            )
+        );
+        
+        // Update pending count
+        setAdminStats(prev => ({
+            ...prev,
+            pendingApprovals: Math.max(0, prev.pendingApprovals - 1)
+        }));
+        
+        // Navigate back to list
+        setAdminApprovalView('list');
+        setSelectedApprovalRequest(null);
+    };
+    
+    const handleRejectProfileChange = (requestId, reason) => {
+        // Mark request as rejected with reason
+        setProfileChangeRequests(prev =>
+            prev.map(r => r.id === requestId
+                ? {
+                    ...r,
+                    status: 'rejected',
+                    rejectedAt: new Date().toISOString(),
+                    rejectReason: reason
+                }
+                : r
+            )
+        );
+        
+        // Update pending count
+        setAdminStats(prev => ({
+            ...prev,
+            pendingApprovals: Math.max(0, prev.pendingApprovals - 1)
+        }));
+        
+        // TODO: Create notification for agent (to be implemented)
+        // For now, we'll just log it
+        console.log(`Profile change rejected for request ${requestId}. Reason: ${reason}`);
+        
+        // Navigate back to list
+        setAdminApprovalView('list');
+        setSelectedApprovalRequest(null);
+    };
+    
+    const handleViewApprovalDetail = (request) => {
+        setSelectedApprovalRequest(request);
+        setAdminApprovalView('detail');
     };
     
     // Admin Article Management Handlers
@@ -774,6 +1132,7 @@ function App() {
                         setCurrentView('landing');
                     }}
                     adminName={adminData.name}
+                    pendingApprovalsCount={profileChangeRequests.filter(r => r.status === 'pending').length}
                 >
                     {adminActiveTab === 'dashboard' && (
                         <AdminDashboard stats={adminStats} />
@@ -789,17 +1148,68 @@ function App() {
                     )}
                     
                     {adminActiveTab === 'agents' && (
-                        <div style={{ padding: '20px', textAlign: 'center' }}>
-                            <h2>エージェント管理</h2>
-                            <p>開発中...</p>
-                        </div>
+                        <>
+                            {adminAgentView === 'list' && (
+                                <AdminAgents
+                                    companyAccounts={companyAccounts}
+                                    messagePickStats={messagePickStats}
+                                    onViewCompanyDetail={handleViewCompanyDetail}
+                                    onCreateCompany={handleCreateCompanyAccount}
+                                />
+                            )}
+                            
+                            {adminAgentView === 'detail' && selectedCompanyAccount && (
+                                <AdminAgentDetail
+                                    company={selectedCompanyAccount}
+                                    messagePickStats={messagePickStats}
+                                    onBack={() => {
+                                        setAdminAgentView('list');
+                                        setSelectedCompanyAccount(null);
+                                    }}
+                                    onEditCompany={handleEditCompanyAccount}
+                                    onDeleteCompany={handleDeleteCompanyAccount}
+                                    onViewAgentDetail={handleViewAgentDetail}
+                                    onCreateAgent={() => setShowCreateAgentModal(true)}
+                                />
+                            )}
+                            
+                            {adminAgentView === 'agent-detail' && selectedAgentAccount && selectedCompanyAccount && (
+                                <AdminChildAccountDetail
+                                    agentAccount={selectedAgentAccount}
+                                    companyAccount={selectedCompanyAccount}
+                                    messagePickStats={messagePickStats}
+                                    onBack={() => {
+                                        setAdminAgentView('detail');
+                                        setSelectedAgentAccount(null);
+                                    }}
+                                    onSave={handleSaveAgentAccount}
+                                    onDelete={handleDeleteAgentAccount}
+                                />
+                            )}
+                        </>
                     )}
                     
                     {adminActiveTab === 'approvals' && (
-                        <div style={{ padding: '20px', textAlign: 'center' }}>
-                            <h2>プロフィール承認</h2>
-                            <p>開発中...</p>
-                        </div>
+                        <>
+                            {adminApprovalView === 'list' && (
+                                <AdminApprovals
+                                    requests={profileChangeRequests}
+                                    onViewDetail={handleViewApprovalDetail}
+                                />
+                            )}
+                            
+                            {adminApprovalView === 'detail' && selectedApprovalRequest && (
+                                <AdminApprovalDetail
+                                    request={selectedApprovalRequest}
+                                    onBack={() => {
+                                        setAdminApprovalView('list');
+                                        setSelectedApprovalRequest(null);
+                                    }}
+                                    onApprove={handleApproveProfileChange}
+                                    onReject={handleRejectProfileChange}
+                                />
+                            )}
+                        </>
                     )}
                     
                     {adminActiveTab === 'notifications' && (
@@ -809,6 +1219,32 @@ function App() {
                         </div>
                     )}
                 </AdminLayout>
+            )}
+            
+            {/* Create Agent Account Modal */}
+            {showCreateAgentModal && selectedCompanyAccount && (
+                <CreateChildAccountModal
+                    companyAccount={selectedCompanyAccount}
+                    onClose={() => setShowCreateAgentModal(false)}
+                    onCreate={handleCreateAgentAccount}
+                />
+            )}
+            
+            {/* Create Company Account Modal */}
+            {showCreateCompanyModal && (
+                <CreateParentAgentModal
+                    onClose={() => setShowCreateCompanyModal(false)}
+                    onCreate={handleCreateCompanyAccountSubmit}
+                />
+            )}
+            
+            {/* Edit Company Account Modal */}
+            {showEditCompanyModal && selectedCompanyAccount && (
+                <EditParentAgentModal
+                    company={selectedCompanyAccount}
+                    onClose={() => setShowEditCompanyModal(false)}
+                    onSave={handleSaveCompanyAccount}
+                />
             )}
 
             {/* User Profile Modal */}
