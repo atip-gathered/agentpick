@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import AgentCard from './AgentCard';
 import { agents } from '../mockData';
 
-const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
+const LandingPage = ({ onStartSwipe, onLogin, onRegister, onAgentLogin }) => {
     const [hoveredButton, setHoveredButton] = useState(null);
     
     // Use the first agent for the main visual
@@ -263,6 +263,32 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
                     >
                         AGENT PICKの使い方 <Copy size={18} strokeWidth={2.5} />
                     </span>
+                </div>
+
+                {/* Agent Login Button */}
+                <div style={{
+                    marginTop: '24px',
+                    textAlign: 'center'
+                }}>
+                    <button
+                        onClick={onAgentLogin}
+                        onMouseEnter={() => setHoveredButton('agent-login')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        style={{
+                            background: hoveredButton === 'agent-login' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.15)',
+                            color: 'white',
+                            border: '2px solid rgba(255,255,255,0.5)',
+                            padding: '12px 32px',
+                            borderRadius: '100px',
+                            fontSize: '15px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            backdropFilter: 'blur(10px)'
+                        }}
+                    >
+                        エージェント用ログイン
+                    </button>
                 </div>
             </div>
 
