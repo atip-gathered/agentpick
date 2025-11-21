@@ -112,7 +112,7 @@ const AdminApprovalDetail = ({ request, onBack, onApprove, onReject }) => {
                     </div>
                     <div style={{
                         background: '#d1fae5',
-                        border: '1px solid '#a7f3d0',
+                        border: '1px solid #a7f3d0',
                         borderRadius: '8px',
                         padding: '10px 12px',
                         fontSize: '13px',

@@ -913,7 +913,11 @@ function App() {
                     )}
 
                     {currentView === 'completion' && (
-                        <CompletionScreen onReset={handleReset} />
+                        <CompletionScreen 
+                            onReset={handleReset}
+                            onMessageClick={() => setCurrentView('messages')}
+                            onSearchClick={() => setCurrentView('search')}
+                        />
                     )}
 
                     {currentView === 'login' && (
