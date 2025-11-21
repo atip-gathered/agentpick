@@ -24,6 +24,9 @@ import AgentMatching from './components/agent/AgentMatching';
 import UserProfileModal from './components/agent/UserProfileModal';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import AgentForgotPasswordPage from './components/agent/AgentForgotPasswordPage';
+import AdminLoginPage from './components/admin/AdminLoginPage';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './components/admin/AdminDashboard';
 import { agents } from './mockData';
 
 function App() {
@@ -48,6 +51,17 @@ function App() {
     const [selectedUserProfile, setSelectedUserProfile] = useState(null);
     const [selectedMessageUserId, setSelectedMessageUserId] = useState(null);
     const [childAgents, setChildAgents] = useState([]);
+    
+    // Admin Mode State
+    const [isAdminMode, setIsAdminMode] = useState(false);
+    const [adminData, setAdminData] = useState(null);
+    const [adminActiveTab, setAdminActiveTab] = useState('dashboard');
+    const [adminStats, setAdminStats] = useState({
+        articles: 5,
+        parentAgents: 12,
+        pendingApprovals: 3,
+        notifications: 8
+    });
     
     // Child Agent Management Handlers
     const handleCreateChildAgent = (childData) => {
@@ -274,6 +288,7 @@ function App() {
                     onLogin={() => setCurrentView('login')}
                     onRegister={() => setCurrentView('register')}
                     onAgentLogin={() => setCurrentView('agent-login')}
+                    onAdminLogin={() => setCurrentView('admin-login')}
                 />
             )}
 
@@ -297,7 +312,9 @@ function App() {
              currentView !== 'agent-login' && 
              currentView !== 'agent-dashboard' &&
              currentView !== 'agent-forgot-password' &&
-             currentView !== 'forgot-password' && (
+             currentView !== 'forgot-password' &&
+             currentView !== 'admin-login' &&
+             currentView !== 'admin-dashboard' && (
                 <Layout
                     activeTab={activeTab}
                     onLogoClick={() => setCurrentView('landing')}
@@ -510,6 +527,24 @@ function App() {
                 />
             )}
 
+            {/* Admin Login Page */}
+            {currentView === 'admin-login' && (
+                <AdminLoginPage
+                    onLogin={(credentials) => {
+                        console.log('Admin logged in:', credentials);
+                        setAdminData({
+                            name: 'システム管理者',
+                            email: credentials.email,
+                            role: 'admin'
+                        });
+                        setIsAdminMode(true);
+                        setAdminActiveTab('dashboard');
+                        setCurrentView('admin-dashboard');
+                    }}
+                    onBack={() => setCurrentView('landing')}
+                />
+            )}
+
             {/* Agent Mode - Complete separate UI */}
             {isAgentMode && currentView === 'agent-dashboard' && agentData && (
                 <AgentLayout
@@ -583,6 +618,53 @@ function App() {
                         />
                     )}
                 </AgentLayout>
+            )}
+
+            {/* Admin Mode - Complete separate UI */}
+            {isAdminMode && currentView === 'admin-dashboard' && adminData && (
+                <AdminLayout
+                    activeTab={adminActiveTab}
+                    onNavigate={(tab) => setAdminActiveTab(tab)}
+                    onLogout={() => {
+                        setIsAdminMode(false);
+                        setAdminData(null);
+                        setAdminActiveTab('dashboard');
+                        setCurrentView('landing');
+                    }}
+                    adminName={adminData.name}
+                >
+                    {adminActiveTab === 'dashboard' && (
+                        <AdminDashboard stats={adminStats} />
+                    )}
+                    
+                    {adminActiveTab === 'articles' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>特集記事管理</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                    
+                    {adminActiveTab === 'agents' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>エージェント管理</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                    
+                    {adminActiveTab === 'approvals' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>プロフィール承認</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                    
+                    {adminActiveTab === 'notifications' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>お知らせ管理</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                </AdminLayout>
             )}
 
             {/* User Profile Modal */}
