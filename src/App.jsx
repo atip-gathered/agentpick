@@ -387,45 +387,7 @@ function App() {
                         />
                     )}
 
-                    {currentView === 'agent-login' && (
-                        <AgentLoginPage
-                            onLogin={(credentials) => {
-                                console.log('Agent logged in:', credentials);
-                                // Set agent data
-                                setAgentData({
-                                    name: credentials.email === 'matsumoto@atip.co.jp' ? '松本 太郎' : 'エージェント',
-                                    email: credentials.email,
-                                    company: 'Atip株式会社',
-                                    location: '東京都',
-                                    specialty: ['IT・Web', 'コンサルティング', 'マーケティング'],
-                                    bio: 'IT業界を中心に、10年以上の転職支援実績があります。',
-                                    phone: '03-1234-5678',
-                                    image: '/api/placeholder/120/120',
-                                    isParentAccount: credentials.email === 'matsumoto@atip.co.jp',
-                                    achievements: [
-                                        { title: '年間MVP受賞', description: '2023年度、最優秀転職支援賞を受賞' }
-                                    ]
-                                });
-                                setIsAgentMode(true);
-                                setAgentActiveTab('dashboard');
-                                setCurrentView('agent-dashboard');
-                            }}
-                            onBack={() => setCurrentView('landing')}
-                            onForgotPassword={() => setCurrentView('agent-forgot-password')}
-                        />
-                    )}
 
-                    {currentView === 'agent-forgot-password' && (
-                        <AgentForgotPasswordPage
-                            onBack={() => setCurrentView('agent-login')}
-                        />
-                    )}
-
-                    {currentView === 'forgot-password' && (
-                        <ForgotPasswordPage
-                            onBack={() => setCurrentView('login')}
-                        />
-                    )}
 
                     {currentView === 'messages' && (
                         <MessageList
@@ -499,6 +461,49 @@ function App() {
                     onBack={() => setCurrentView('messages')}
                     messages={messages[currentChatAgent.id] || []}
                     onSendMessage={handleSendMessage}
+                />
+            )}
+
+            {/* Agent Login Page - Outside Layout */}
+            {currentView === 'agent-login' && (
+                <AgentLoginPage
+                    onLogin={(credentials) => {
+                        console.log('Agent logged in:', credentials);
+                        // Set agent data
+                        setAgentData({
+                            name: credentials.email === 'matsumoto@atip.co.jp' ? '松本 太郎' : 'エージェント',
+                            email: credentials.email,
+                            company: 'Atip株式会社',
+                            location: '東京都',
+                            specialty: ['IT・Web', 'コンサルティング', 'マーケティング'],
+                            bio: 'IT業界を中心に、10年以上の転職支援実績があります。',
+                            phone: '03-1234-5678',
+                            image: '/api/placeholder/120/120',
+                            isParentAccount: credentials.email === 'matsumoto@atip.co.jp',
+                            achievements: [
+                                { title: '年間MVP受賞', description: '2023年度、最優秀転職支援賞を受賞' }
+                            ]
+                        });
+                        setIsAgentMode(true);
+                        setAgentActiveTab('dashboard');
+                        setCurrentView('agent-dashboard');
+                    }}
+                    onBack={() => setCurrentView('landing')}
+                    onForgotPassword={() => setCurrentView('agent-forgot-password')}
+                />
+            )}
+
+            {/* Agent Forgot Password Page - Outside Layout */}
+            {currentView === 'agent-forgot-password' && (
+                <AgentForgotPasswordPage
+                    onBack={() => setCurrentView('agent-login')}
+                />
+            )}
+
+            {/* User Forgot Password Page - Outside Layout */}
+            {currentView === 'forgot-password' && (
+                <ForgotPasswordPage
+                    onBack={() => setCurrentView('login')}
                 />
             )}
 
