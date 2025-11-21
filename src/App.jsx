@@ -24,6 +24,9 @@ import AgentMatching from './components/agent/AgentMatching';
 import UserProfileModal from './components/agent/UserProfileModal';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import AgentForgotPasswordPage from './components/agent/AgentForgotPasswordPage';
+import AdminLoginPage from './components/admin/AdminLoginPage';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './components/admin/AdminDashboard';
 import { agents } from './mockData';
 
 function App() {
@@ -46,7 +49,19 @@ function App() {
     const [agentData, setAgentData] = useState(null);
     const [agentActiveTab, setAgentActiveTab] = useState('dashboard');
     const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+    const [selectedMessageUserId, setSelectedMessageUserId] = useState(null);
     const [childAgents, setChildAgents] = useState([]);
+    
+    // Admin Mode State
+    const [isAdminMode, setIsAdminMode] = useState(false);
+    const [adminData, setAdminData] = useState(null);
+    const [adminActiveTab, setAdminActiveTab] = useState('dashboard');
+    const [adminStats, setAdminStats] = useState({
+        articles: 5,
+        parentAgents: 12,
+        pendingApprovals: 3,
+        notifications: 8
+    });
     
     // Child Agent Management Handlers
     const handleCreateChildAgent = (childData) => {
@@ -90,7 +105,7 @@ function App() {
             position: 'ソフトウェアエンジニア',
             email: 'tanaka@example.com',
             phone: '090-1234-5678',
-            status: 'active',
+            status: 'before_first_meeting',
             matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
             desiredPosition: 'シニアエンジニア',
             hasProfileAccess: false,
@@ -100,7 +115,8 @@ function App() {
             age: '29歳',
             gender: '男性',
             location: '東京都',
-            education: '早稲田大学 理工学部 卒業'
+            education: '早稲田大学 理工学部 卒業',
+            assignedChildAgent: null // 親アカウントが直接担当
         },
         { 
             id: 2, 
@@ -118,7 +134,8 @@ function App() {
             age: '32歳',
             gender: '女性',
             location: '神奈川県',
-            education: '慶應義塾大学 商学部 卒業'
+            education: '慶應義塾大学 商学部 卒業',
+            assignedChildAgent: null // 親アカウントが直接担当
         }
     ]);
     const activeTab = currentView === 'swipe' ? 'swipe' :
@@ -271,6 +288,7 @@ function App() {
                     onLogin={() => setCurrentView('login')}
                     onRegister={() => setCurrentView('register')}
                     onAgentLogin={() => setCurrentView('agent-login')}
+                    onAdminLogin={() => setCurrentView('admin-login')}
                 />
             )}
 
@@ -294,7 +312,9 @@ function App() {
              currentView !== 'agent-login' && 
              currentView !== 'agent-dashboard' &&
              currentView !== 'agent-forgot-password' &&
-             currentView !== 'forgot-password' && (
+             currentView !== 'forgot-password' &&
+             currentView !== 'admin-login' &&
+             currentView !== 'admin-dashboard' && (
                 <Layout
                     activeTab={activeTab}
                     onLogoClick={() => setCurrentView('landing')}
@@ -387,45 +407,7 @@ function App() {
                         />
                     )}
 
-                    {currentView === 'agent-login' && (
-                        <AgentLoginPage
-                            onLogin={(credentials) => {
-                                console.log('Agent logged in:', credentials);
-                                // Set agent data
-                                setAgentData({
-                                    name: credentials.email === 'matsumoto@atip.co.jp' ? '松本 太郎' : 'エージェント',
-                                    email: credentials.email,
-                                    company: 'Atip株式会社',
-                                    location: '東京都',
-                                    specialty: ['IT・Web', 'コンサルティング', 'マーケティング'],
-                                    bio: 'IT業界を中心に、10年以上の転職支援実績があります。',
-                                    phone: '03-1234-5678',
-                                    image: '/api/placeholder/120/120',
-                                    isParentAccount: credentials.email === 'matsumoto@atip.co.jp',
-                                    achievements: [
-                                        { title: '年間MVP受賞', description: '2023年度、最優秀転職支援賞を受賞' }
-                                    ]
-                                });
-                                setIsAgentMode(true);
-                                setAgentActiveTab('dashboard');
-                                setCurrentView('agent-dashboard');
-                            }}
-                            onBack={() => setCurrentView('landing')}
-                            onForgotPassword={() => setCurrentView('agent-forgot-password')}
-                        />
-                    )}
 
-                    {currentView === 'agent-forgot-password' && (
-                        <AgentForgotPasswordPage
-                            onBack={() => setCurrentView('agent-login')}
-                        />
-                    )}
-
-                    {currentView === 'forgot-password' && (
-                        <ForgotPasswordPage
-                            onBack={() => setCurrentView('login')}
-                        />
-                    )}
 
                     {currentView === 'messages' && (
                         <MessageList
@@ -502,11 +484,78 @@ function App() {
                 />
             )}
 
+            {/* Agent Login Page - Outside Layout */}
+            {currentView === 'agent-login' && (
+                <AgentLoginPage
+                    onLogin={(credentials) => {
+                        console.log('Agent logged in:', credentials);
+                        // Set agent data
+                        setAgentData({
+                            name: credentials.email === 'matsumoto@atip.co.jp' ? '松本 太郎' : 'エージェント',
+                            email: credentials.email,
+                            company: 'Atip株式会社',
+                            location: '東京都',
+                            specialty: ['IT・Web', 'コンサルティング', 'マーケティング'],
+                            bio: 'IT業界を中心に、10年以上の転職支援実績があります。',
+                            phone: '03-1234-5678',
+                            image: '/api/placeholder/120/120',
+                            isParentAccount: credentials.email === 'matsumoto@atip.co.jp',
+                            achievements: [
+                                { title: '年間MVP受賞', description: '2023年度、最優秀転職支援賞を受賞' }
+                            ]
+                        });
+                        setIsAgentMode(true);
+                        setAgentActiveTab('dashboard');
+                        setCurrentView('agent-dashboard');
+                    }}
+                    onBack={() => setCurrentView('landing')}
+                    onForgotPassword={() => setCurrentView('agent-forgot-password')}
+                />
+            )}
+
+            {/* Agent Forgot Password Page - Outside Layout */}
+            {currentView === 'agent-forgot-password' && (
+                <AgentForgotPasswordPage
+                    onBack={() => setCurrentView('agent-login')}
+                />
+            )}
+
+            {/* User Forgot Password Page - Outside Layout */}
+            {currentView === 'forgot-password' && (
+                <ForgotPasswordPage
+                    onBack={() => setCurrentView('login')}
+                />
+            )}
+
+            {/* Admin Login Page */}
+            {currentView === 'admin-login' && (
+                <AdminLoginPage
+                    onLogin={(credentials) => {
+                        console.log('Admin logged in:', credentials);
+                        setAdminData({
+                            name: 'システム管理者',
+                            email: credentials.email,
+                            role: 'admin'
+                        });
+                        setIsAdminMode(true);
+                        setAdminActiveTab('dashboard');
+                        setCurrentView('admin-dashboard');
+                    }}
+                    onBack={() => setCurrentView('landing')}
+                />
+            )}
+
             {/* Agent Mode - Complete separate UI */}
             {isAgentMode && currentView === 'agent-dashboard' && agentData && (
                 <AgentLayout
                     activeTab={agentActiveTab}
-                    onNavigate={(tab) => setAgentActiveTab(tab)}
+                    onNavigate={(tab) => {
+                        setAgentActiveTab(tab);
+                        // Reset selected message user when navigating away from messages tab
+                        if (tab !== 'messages') {
+                            setSelectedMessageUserId(null);
+                        }
+                    }}
                     onLogout={() => {
                         setIsAgentMode(false);
                         setAgentData(null);
@@ -539,12 +588,24 @@ function App() {
                             onViewProfile={(user) => {
                                 setSelectedUserProfile(user);
                             }}
+                            agentData={agentData}
+                            childAgents={childAgents}
+                            initialSelectedUserId={selectedMessageUserId}
                         />
                     )}
                     
                     {agentActiveTab === 'matching' && (
                         <AgentMatching
                             matchedUsers={matchedUsers}
+                            agentData={agentData}
+                            childAgents={childAgents}
+                            onViewProfile={(user) => {
+                                setSelectedUserProfile(user);
+                            }}
+                            onNavigateToChat={(userId) => {
+                                setSelectedMessageUserId(userId);
+                                setAgentActiveTab('messages');
+                            }}
                         />
                     )}
                     
@@ -557,6 +618,53 @@ function App() {
                         />
                     )}
                 </AgentLayout>
+            )}
+
+            {/* Admin Mode - Complete separate UI */}
+            {isAdminMode && currentView === 'admin-dashboard' && adminData && (
+                <AdminLayout
+                    activeTab={adminActiveTab}
+                    onNavigate={(tab) => setAdminActiveTab(tab)}
+                    onLogout={() => {
+                        setIsAdminMode(false);
+                        setAdminData(null);
+                        setAdminActiveTab('dashboard');
+                        setCurrentView('landing');
+                    }}
+                    adminName={adminData.name}
+                >
+                    {adminActiveTab === 'dashboard' && (
+                        <AdminDashboard stats={adminStats} />
+                    )}
+                    
+                    {adminActiveTab === 'articles' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>特集記事管理</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                    
+                    {adminActiveTab === 'agents' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>エージェント管理</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                    
+                    {adminActiveTab === 'approvals' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>プロフィール承認</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                    
+                    {adminActiveTab === 'notifications' && (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>
+                            <h2>お知らせ管理</h2>
+                            <p>開発中...</p>
+                        </div>
+                    )}
+                </AdminLayout>
             )}
 
             {/* User Profile Modal */}

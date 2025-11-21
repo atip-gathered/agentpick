@@ -1,13 +1,31 @@
-import React, { useState } from 'react';
-import { MessageCircle, Search, Send, Paperclip, Image, Mic, Check, CheckCheck, ArrowLeft, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MessageCircle, Search, Send, Paperclip, Image, Mic, Check, CheckCheck, ArrowLeft, Filter, User } from 'lucide-react';
 
-const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser, onViewProfile }) => {
+const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser, onViewProfile, agentData, childAgents, initialSelectedUserId }) => {
+    const isParentAccount = agentData?.isParentAccount || false;
     const [selectedUser, setSelectedUser] = useState(null);
+    
+    // Set initial selected user if provided
+    useEffect(() => {
+        if (initialSelectedUserId) {
+            const user = matchedUsers.find(u => u.id === initialSelectedUserId);
+            if (user) {
+                setSelectedUser(user);
+            }
+        }
+    }, [initialSelectedUserId, matchedUsers]);
     const [messageText, setMessageText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'unread', 'active'
     const [hoveredItem, setHoveredItem] = useState(null);
     const [showFilterMenu, setShowFilterMenu] = useState(false);
+
+    // Get child agent name by ID
+    const getChildAgentName = (childAgentId) => {
+        if (!childAgentId) return '親アカウント';
+        const childAgent = childAgents?.find(child => child.id === childAgentId);
+        return childAgent ? childAgent.name : '未割当';
+    };
 
     // Get messages for a specific user
     const getUserMessages = (userId) => {
@@ -292,13 +310,27 @@ const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser
                                                 alignItems: 'center',
                                                 marginBottom: '4px'
                                             }}>
-                                                <span style={{
-                                                    fontSize: '15px',
-                                                    fontWeight: unreadCount > 0 ? '600' : '500',
-                                                    color: '#333'
-                                                }}>
-                                                    {user.hasProfileAccess ? user.name : '新規マッチング（メッセージ待ち）'}
-                                                </span>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                    <span style={{
+                                                        fontSize: '15px',
+                                                        fontWeight: unreadCount > 0 ? '600' : '500',
+                                                        color: '#333'
+                                                    }}>
+                                                        {user.hasProfileAccess ? user.name : '新規マッチング（メッセージ待ち）'}
+                                                    </span>
+                                                    {isParentAccount && (
+                                                        <span style={{
+                                                            fontSize: '11px',
+                                                            color: '#007AFF',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '4px'
+                                                        }}>
+                                                            <User size={12} />
+                                                            {getChildAgentName(user.assignedChildAgent)}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 {lastMessage && (
                                                     <span style={{
                                                         fontSize: '11px',
@@ -445,6 +477,19 @@ const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser
                     }}>
                         {selectedUser.hasProfileAccess ? selectedUser.name : '新規マッチング'}
                     </div>
+                    {isParentAccount && (
+                        <div style={{
+                            fontSize: '11px',
+                            color: '#007AFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            marginBottom: '2px'
+                        }}>
+                            <User size={12} />
+                            担当: {getChildAgentName(selectedUser.assignedChildAgent)}
+                        </div>
+                    )}
                     <div style={{
                         fontSize: '12px',
                         color: '#666'
@@ -544,7 +589,31 @@ const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser
                 padding: '12px 16px',
                 borderTop: '1px solid #E5E5E5'
             }}>
-                {!selectedUser.hasProfileAccess ? (
+                {isParentAccount ? (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '12px',
+                        background: '#F0F8FF',
+                        borderRadius: '12px',
+                        border: '1px solid #D0E8FF'
+                    }}>
+                        <p style={{
+                            margin: 0,
+                            fontSize: '13px',
+                            color: '#007AFF',
+                            fontWeight: '500'
+                        }}>
+                            👁️ 閲覧専用モード
+                        </p>
+                        <p style={{
+                            margin: '4px 0 0 0',
+                            fontSize: '12px',
+                            color: '#666'
+                        }}>
+                            親アカウントはメッセージの閲覧のみ可能です。メッセージの送信は担当の子アカウントが行います。
+                        </p>
+                    </div>
+                ) : !selectedUser.hasProfileAccess ? (
                     <div style={{
                         textAlign: 'center',
                         padding: '12px',

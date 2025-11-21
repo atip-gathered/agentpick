@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import AgentCard from './AgentCard';
 import { agents } from '../mockData';
 
-const LandingPage = ({ onStartSwipe, onLogin, onRegister, onAgentLogin }) => {
+const LandingPage = ({ onStartSwipe, onLogin, onRegister, onAgentLogin, onAdminLogin }) => {
     const [hoveredButton, setHoveredButton] = useState(null);
     
     // Use the first agent for the main visual
@@ -288,6 +288,32 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister, onAgentLogin }) => {
                         }}
                     >
                         エージェント用ログイン
+                    </button>
+                </div>
+
+                {/* Admin Login Button */}
+                <div style={{
+                    marginTop: '12px',
+                    textAlign: 'center'
+                }}>
+                    <button
+                        onClick={onAdminLogin}
+                        onMouseEnter={() => setHoveredButton('admin-login')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        style={{
+                            background: 'transparent',
+                            color: 'rgba(255,255,255,0.8)',
+                            border: 'none',
+                            padding: '8px 16px',
+                            borderRadius: '100px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            textDecoration: hoveredButton === 'admin-login' ? 'underline' : 'none'
+                        }}
+                    >
+                        🔒 システム管理者
                     </button>
                 </div>
             </div>

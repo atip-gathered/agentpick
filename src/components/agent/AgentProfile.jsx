@@ -1,9 +1,65 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Edit2, Save, X, Plus, Trash2, Briefcase, Award, FileText, MapPin, Mail, Phone, Globe, Linkedin } from 'lucide-react';
+import { Camera, Edit2, Save, X, Plus, Trash2, Briefcase, Award, FileText, MapPin, Mail, Phone, Globe, Linkedin, Check } from 'lucide-react';
+
+// 企業タイプの選択肢
+const COMPANY_TYPES = [
+    'スタートアップ（Seed/アーリー）',
+    'ベンチャー',
+    'メガベンチャー',
+    '中小企業',
+    '大手・上場企業',
+    '外資系企業'
+];
+
+// 47都道府県
+const PREFECTURES = [
+    '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+    '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
+    '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県',
+    '岐阜県', '静岡県', '愛知県', '三重県',
+    '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県',
+    '鳥取県', '島根県', '岡山県', '広島県', '山口県',
+    '徳島県', '香川県', '愛媛県', '高知県',
+    '福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'
+];
+
+// 採用カテゴリ
+const RECRUITMENT_CATEGORIES = [
+    '新卒採用',
+    '中途採用',
+    '第二新卒・既卒'
+];
+
+// 職種リスト
+const JOB_CATEGORIES = [
+    '営業系',
+    '建築・不動産系',
+    '販売接客・サービス系',
+    'IT・エンジニア系',
+    '企画・マーケティング系',
+    '事務・管理系',
+    '医療・介護・福祉系',
+    '技術・製造系',
+    '企画・クリエイティブ系',
+    '運輸・物流系',
+    'コンサルティング系',
+    '保険系',
+    '金融系',
+    'メーカー系',
+    '建設系',
+    '土木系',
+    'その他'
+];
 
 const AgentProfile = ({ agentData, onSave }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [editData, setEditData] = useState({ ...agentData });
+    const [editData, setEditData] = useState({ 
+        ...agentData,
+        specialtyCompanyTypes: agentData.specialtyCompanyTypes || [],
+        specialtyRegions: agentData.specialtyRegions || [],
+        recruitmentCategory: agentData.recruitmentCategory || '',
+        specialtyJobCategories: agentData.specialtyJobCategories || []
+    });
     const [hoveredItem, setHoveredItem] = useState(null);
     const photoInputRef = useRef(null);
 
@@ -29,27 +85,6 @@ const AgentProfile = ({ agentData, onSave }) => {
         }
     };
 
-    const handleAddSpecialty = () => {
-        setEditData(prev => ({
-            ...prev,
-            specialty: [...prev.specialty, '']
-        }));
-    };
-
-    const handleRemoveSpecialty = (index) => {
-        setEditData(prev => ({
-            ...prev,
-            specialty: prev.specialty.filter((_, i) => i !== index)
-        }));
-    };
-
-    const handleSpecialtyChange = (index, value) => {
-        setEditData(prev => ({
-            ...prev,
-            specialty: prev.specialty.map((item, i) => i === index ? value : item)
-        }));
-    };
-
     const handleAddAchievement = () => {
         setEditData(prev => ({
             ...prev,
@@ -73,7 +108,41 @@ const AgentProfile = ({ agentData, onSave }) => {
         }));
     };
 
+    // 複数選択のトグル処理
+    const toggleArrayItem = (field, item) => {
+        setEditData(prev => {
+            const currentArray = prev[field] || [];
+            const isSelected = currentArray.includes(item);
+            return {
+                ...prev,
+                [field]: isSelected 
+                    ? currentArray.filter(i => i !== item)
+                    : [...currentArray, item]
+            };
+        });
+    };
 
+    // 職種の追加
+    const addJobCategory = (category) => {
+        setEditData(prev => {
+            const currentCategories = prev.specialtyJobCategories || [];
+            if (currentCategories.includes(category)) {
+                return prev;
+            }
+            return {
+                ...prev,
+                specialtyJobCategories: [...currentCategories, category]
+            };
+        });
+    };
+
+    // 職種の削除
+    const removeJobCategory = (category) => {
+        setEditData(prev => ({
+            ...prev,
+            specialtyJobCategories: (prev.specialtyJobCategories || []).filter(c => c !== category)
+        }));
+    };
 
     return (
         <div style={{
@@ -458,118 +527,6 @@ const AgentProfile = ({ agentData, onSave }) => {
                 </div>
             </div>
 
-            {/* Specialty */}
-            <div style={{
-                background: 'white',
-                margin: '0 16px 16px',
-                borderRadius: '12px',
-                padding: '20px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-            }}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '16px'
-                }}>
-                    <h3 style={{
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        color: '#333',
-                        margin: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}>
-                        <Award size={18} color="#007AFF" />
-                        専門分野
-                    </h3>
-                    {isEditing && (
-                        <button
-                            onClick={handleAddSpecialty}
-                            onMouseEnter={() => setHoveredItem('add-specialty')}
-                            onMouseLeave={() => setHoveredItem(null)}
-                            style={{
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                border: 'none',
-                                background: hoveredItem === 'add-specialty' ? '#E5F1FF' : 'transparent',
-                                color: '#007AFF',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                transition: 'all 0.2s ease'
-                            }}
-                        >
-                            <Plus size={14} />
-                            追加
-                        </button>
-                    )}
-                </div>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {editData.specialty.map((item, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px'
-                            }}
-                        >
-                            {isEditing ? (
-                                <>
-                                    <input
-                                        type="text"
-                                        value={item}
-                                        onChange={(e) => handleSpecialtyChange(index, e.target.value)}
-                                        style={{
-                                            padding: '6px 12px',
-                                            border: '1px solid #007AFF',
-                                            borderRadius: '16px',
-                                            fontSize: '13px',
-                                            outline: 'none',
-                                            minWidth: '100px'
-                                        }}
-                                    />
-                                    <button
-                                        onClick={() => handleRemoveSpecialty(index)}
-                                        style={{
-                                            width: '24px',
-                                            height: '24px',
-                                            borderRadius: '50%',
-                                            border: 'none',
-                                            background: '#FFE5E5',
-                                            color: '#FF3B30',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </>
-                            ) : (
-                                <span style={{
-                                    padding: '6px 16px',
-                                    background: '#E5F1FF',
-                                    color: '#007AFF',
-                                    borderRadius: '16px',
-                                    fontSize: '13px',
-                                    fontWeight: '500'
-                                }}>
-                                    {item}
-                                </span>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* Summary */}
             <div style={{
                 background: 'white',
@@ -718,26 +675,44 @@ const AgentProfile = ({ agentData, onSave }) => {
                             marginBottom: '8px',
                             display: 'block'
                         }}>
-                            得意な企業タイプ
+                            得意な企業タイプ（複数選択可）
                         </label>
                         {isEditing ? (
-                            <input
-                                type="text"
-                                value={editData.specialtyCompanyType || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, specialtyCompanyType: e.target.value }))}
-                                placeholder="例：スタートアップ、大手企業、外資系など"
-                                style={{
-                                    width: '100%',
-                                    padding: '10px 12px',
-                                    border: '1px solid #E5E5E5',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    outline: 'none'
-                                }}
-                            />
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '8px'
+                            }}>
+                                {COMPANY_TYPES.map(type => {
+                                    const isSelected = (editData.specialtyCompanyTypes || []).includes(type);
+                                    return (
+                                        <div
+                                            key={type}
+                                            onClick={() => toggleArrayItem('specialtyCompanyTypes', type)}
+                                            style={{
+                                                padding: '10px 12px',
+                                                border: `2px solid ${isSelected ? '#007AFF' : '#E5E5E5'}`,
+                                                borderRadius: '8px',
+                                                fontSize: '14px',
+                                                cursor: 'pointer',
+                                                background: isSelected ? '#F0F8FF' : 'white',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            <span>{type}</span>
+                                            {isSelected && <Check size={18} color="#007AFF" />}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         ) : (
                             <div style={{ fontSize: '14px', color: '#333' }}>
-                                {editData.specialtyCompanyType || '未設定'}
+                                {(editData.specialtyCompanyTypes || []).length > 0 
+                                    ? (editData.specialtyCompanyTypes || []).join('、') 
+                                    : '未設定'}
                             </div>
                         )}
                     </div>
@@ -749,26 +724,50 @@ const AgentProfile = ({ agentData, onSave }) => {
                             marginBottom: '8px',
                             display: 'block'
                         }}>
-                            得意な地域
+                            得意な地域（複数選択可）
                         </label>
                         {isEditing ? (
-                            <input
-                                type="text"
-                                value={editData.specialtyRegion || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, specialtyRegion: e.target.value }))}
-                                placeholder="例：東京都、関東圏、全国など"
-                                style={{
-                                    width: '100%',
-                                    padding: '10px 12px',
-                                    border: '1px solid #E5E5E5',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    outline: 'none'
-                                }}
-                            />
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 1fr)',
+                                gap: '8px',
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                padding: '8px',
+                                border: '1px solid #E5E5E5',
+                                borderRadius: '8px',
+                                background: '#FAFAFA'
+                            }}>
+                                {PREFECTURES.map(prefecture => {
+                                    const isSelected = (editData.specialtyRegions || []).includes(prefecture);
+                                    return (
+                                        <div
+                                            key={prefecture}
+                                            onClick={() => toggleArrayItem('specialtyRegions', prefecture)}
+                                            style={{
+                                                padding: '8px 10px',
+                                                border: `2px solid ${isSelected ? '#007AFF' : '#E5E5E5'}`,
+                                                borderRadius: '6px',
+                                                fontSize: '13px',
+                                                cursor: 'pointer',
+                                                background: isSelected ? '#F0F8FF' : 'white',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            <span>{prefecture}</span>
+                                            {isSelected && <Check size={16} color="#007AFF" />}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         ) : (
                             <div style={{ fontSize: '14px', color: '#333' }}>
-                                {editData.specialtyRegion || '未設定'}
+                                {(editData.specialtyRegions || []).length > 0 
+                                    ? (editData.specialtyRegions || []).join('、') 
+                                    : '未設定'}
                             </div>
                         )}
                     </div>
@@ -815,26 +814,139 @@ const AgentProfile = ({ agentData, onSave }) => {
                             marginBottom: '8px',
                             display: 'block'
                         }}>
-                            得意な採用カテゴリ
+                            得意な採用カテゴリ（1つ選択）
                         </label>
                         {isEditing ? (
-                            <input
-                                type="text"
-                                value={editData.specialtyCategory || ''}
-                                onChange={(e) => setEditData(prev => ({ ...prev, specialtyCategory: e.target.value }))}
-                                placeholder="例：エンジニア、営業、マーケティングなど"
-                                style={{
-                                    width: '100%',
-                                    padding: '10px 12px',
-                                    border: '1px solid #E5E5E5',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    outline: 'none'
-                                }}
-                            />
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '8px'
+                            }}>
+                                {RECRUITMENT_CATEGORIES.map(category => {
+                                    const isSelected = editData.recruitmentCategory === category;
+                                    return (
+                                        <div
+                                            key={category}
+                                            onClick={() => setEditData(prev => ({ ...prev, recruitmentCategory: category }))}
+                                            style={{
+                                                padding: '10px 12px',
+                                                border: `2px solid ${isSelected ? '#007AFF' : '#E5E5E5'}`,
+                                                borderRadius: '8px',
+                                                fontSize: '14px',
+                                                cursor: 'pointer',
+                                                background: isSelected ? '#F0F8FF' : 'white',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            <span>{category}</span>
+                                            {isSelected && <Check size={18} color="#007AFF" />}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         ) : (
                             <div style={{ fontSize: '14px', color: '#333' }}>
-                                {editData.specialtyCategory || '未設定'}
+                                {editData.recruitmentCategory || '未設定'}
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label style={{
+                            fontSize: '13px',
+                            color: '#666',
+                            marginBottom: '8px',
+                            display: 'block'
+                        }}>
+                            得意な職種（複数選択可）
+                        </label>
+                        {isEditing ? (
+                            <>
+                                {/* 選択済み職種 */}
+                                {(editData.specialtyJobCategories || []).length > 0 && (
+                                    <div style={{
+                                        display: 'flex',
+                                        flexWrap: 'wrap',
+                                        gap: '8px',
+                                        marginBottom: '12px'
+                                    }}>
+                                        {(editData.specialtyJobCategories || []).map(category => (
+                                            <div
+                                                key={category}
+                                                style={{
+                                                    background: '#007AFF',
+                                                    color: 'white',
+                                                    padding: '6px 12px',
+                                                    borderRadius: '20px',
+                                                    fontSize: '13px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px'
+                                                }}
+                                            >
+                                                <span>{category}</span>
+                                                <X
+                                                    size={14}
+                                                    onClick={() => removeJobCategory(category)}
+                                                    style={{ cursor: 'pointer' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                
+                                {/* 職種選択リスト */}
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(2, 1fr)',
+                                    gap: '8px',
+                                    maxHeight: '300px',
+                                    overflowY: 'auto',
+                                    padding: '8px',
+                                    border: '1px solid #E5E5E5',
+                                    borderRadius: '8px',
+                                    background: '#FAFAFA'
+                                }}>
+                                    {JOB_CATEGORIES.map(category => {
+                                        const isSelected = (editData.specialtyJobCategories || []).includes(category);
+                                        return (
+                                            <div
+                                                key={category}
+                                                onClick={() => {
+                                                    if (isSelected) {
+                                                        removeJobCategory(category);
+                                                    } else {
+                                                        addJobCategory(category);
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: '8px 10px',
+                                                    border: `2px solid ${isSelected ? '#007AFF' : '#E5E5E5'}`,
+                                                    borderRadius: '6px',
+                                                    fontSize: '13px',
+                                                    cursor: 'pointer',
+                                                    background: isSelected ? '#F0F8FF' : 'white',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                    transition: 'all 0.2s ease'
+                                                }}
+                                            >
+                                                <span>{category}</span>
+                                                {isSelected && <Check size={16} color="#007AFF" />}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{ fontSize: '14px', color: '#333' }}>
+                                {(editData.specialtyJobCategories || []).length > 0 
+                                    ? (editData.specialtyJobCategories || []).join('、') 
+                                    : '未設定'}
                             </div>
                         )}
                     </div>

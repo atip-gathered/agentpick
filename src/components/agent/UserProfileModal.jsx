@@ -23,10 +23,13 @@ const UserProfileModal = ({ user, onClose, onStatusChange }) => {
         
         // Show toast notification
         const statusLabels = {
-            'active': 'アクティブ',
-            'in_progress': '選考中',
-            'hired': '内定',
-            'closed': 'クローズ'
+            'before_first_meeting': '初回面談前',
+            'first_meeting_done': '初回面談済み',
+            'in_progress': '対応中',
+            'offer_accepted': '内定承諾',
+            'rejected': '落選',
+            'withdrawn': '辞退',
+            'no_response': '音信不通'
         };
         
         setToastMessage(`ステータスを「${statusLabels[newStatus]}」に変更しました`);
@@ -186,10 +189,13 @@ const UserProfileModal = ({ user, onClose, onStatusChange }) => {
                                 color: '#333'
                             }}
                         >
-                            <option value="active">アクティブ</option>
-                            <option value="in_progress">選考中</option>
-                            <option value="hired">内定</option>
-                            <option value="closed">クローズ</option>
+                            <option value="before_first_meeting">初回面談前</option>
+                            <option value="first_meeting_done">初回面談済み</option>
+                            <option value="in_progress">対応中</option>
+                            <option value="offer_accepted">内定承諾</option>
+                            <option value="rejected">落選</option>
+                            <option value="withdrawn">辞退</option>
+                            <option value="no_response">音信不通</option>
                         </select>
                     </div>
 
