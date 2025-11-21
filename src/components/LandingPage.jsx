@@ -72,7 +72,7 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
                 zIndex: 10
             }}>
                 <img
-                    src="/assets/logo-white.png"
+                    src="/logo-white.png"
                     alt="AGENT PICK"
                     style={{ height: '40px', objectFit: 'contain' }}
                 />

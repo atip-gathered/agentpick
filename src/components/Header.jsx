@@ -24,7 +24,7 @@ const Header = ({ onLogoClick, onRegisterClick, onMenuClick }) => {
             >
                 {/* Logo Image */}
                 <img
-                    src="/assets/logo-colored.png"
+                    src="/logo.png"
                     alt="AGENT PICK"
                     style={{ height: '28px', objectFit: 'contain' }}
                 />
