@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Edit, Download, Upload, Check, X } from 'lucide-react';
+import { Edit, Download, Upload, Check, X, User, Briefcase, FileText, Target, File } from 'lucide-react';
 
 const ProfilePage = ({ onNavigate }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -209,9 +209,14 @@ const ProfilePage = ({ onNavigate }) => {
                 </div>
 
                 {/* Basic Information Section */}
-                <div style={{ marginTop: '8px', background: 'white' }}>
-                    <SectionHeader title="基本情報" emoji="👤" />
-                    <div>
+                <div style={{ marginTop: '8px' }}>
+                    <SectionHeader title="基本情報" icon={User} />
+                    <div style={{ 
+                        background: 'white',
+                        borderRadius: '0 0 12px 12px',
+                        margin: '0 12px',
+                        marginBottom: '8px'
+                    }}>
                         <EditableInfoRow
                             label="生年月日"
                             value={profileData.birthDate}
@@ -252,9 +257,14 @@ const ProfilePage = ({ onNavigate }) => {
                 </div>
 
                 {/* Job Search Conditions Section */}
-                <div style={{ marginTop: '8px', background: 'white' }}>
-                    <SectionHeader title="転職経歴条件" emoji="💼" />
-                    <div>
+                <div style={{ marginTop: '8px' }}>
+                    <SectionHeader title="転職経歴条件" icon={Target} />
+                    <div style={{ 
+                        background: 'white',
+                        borderRadius: '0 0 12px 12px',
+                        margin: '0 12px',
+                        marginBottom: '8px'
+                    }}>
                         <EditableInfoRow
                             label="希望職種"
                             value={profileData.desiredPosition}
@@ -295,43 +305,55 @@ const ProfilePage = ({ onNavigate }) => {
                 </div>
 
                 {/* Self Introduction Section */}
-                <div style={{ marginTop: '8px', background: 'white' }}>
-                    <SectionHeader title="自己紹介" emoji="📝" />
-                    {isEditing ? (
-                        <textarea
-                            value={editData.selfIntroduction}
-                            onChange={(e) => handleChange('selfIntroduction', e.target.value)}
-                            style={{
-                                width: '100%',
-                                minHeight: '200px',
+                <div style={{ marginTop: '8px' }}>
+                    <SectionHeader title="自己紹介" icon={FileText} />
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '0 0 12px 12px',
+                        margin: '0 12px',
+                        marginBottom: '8px'
+                    }}>
+                        {isEditing ? (
+                            <textarea
+                                value={editData.selfIntroduction}
+                                onChange={(e) => handleChange('selfIntroduction', e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    minHeight: '200px',
+                                    padding: '16px',
+                                    fontSize: '13px',
+                                    lineHeight: '1.8',
+                                    color: '#333',
+                                    border: 'none',
+                                    borderRadius: '0 0 12px 12px',
+                                    boxSizing: 'border-box',
+                                    fontFamily: 'inherit',
+                                    resize: 'vertical',
+                                    outline: 'none'
+                                }}
+                            />
+                        ) : (
+                            <div style={{
                                 padding: '16px',
                                 fontSize: '13px',
                                 lineHeight: '1.8',
                                 color: '#333',
-                                border: '1px solid #E5E5EA',
-                                borderRadius: '4px',
-                                boxSizing: 'border-box',
-                                fontFamily: 'inherit',
-                                resize: 'vertical'
-                            }}
-                        />
-                    ) : (
-                        <div style={{
-                            padding: '16px',
-                            fontSize: '13px',
-                            lineHeight: '1.8',
-                            color: '#333',
-                            whiteSpace: 'pre-wrap'
-                        }}>
-                            {profileData.selfIntroduction}
-                        </div>
-                    )}
+                                whiteSpace: 'pre-wrap'
+                            }}>
+                                {profileData.selfIntroduction}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Experience Section */}
-                <div style={{ marginTop: '8px', background: 'white' }}>
-                    <SectionHeader title="経験職種" emoji="💼" />
-                    <div style={{ padding: '12px 16px' }}>
+                <div style={{ marginTop: '8px' }}>
+                    <SectionHeader title="経験職種" icon={Briefcase} />
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '0 0 12px 12px',
+                        margin: '0 12px',
+                        marginBottom: '8px', padding: '12px 16px' }}>
                         {(isEditing ? editData : profileData).experiencedPositions.map((position, index) => (
                             <div key={index} style={{
                                 padding: '6px 0',
@@ -367,9 +389,14 @@ const ProfilePage = ({ onNavigate }) => {
                 </div>
 
                 {/* Documents Section */}
-                <div style={{ marginTop: '8px', background: 'white' }}>
-                    <SectionHeader title="記録情報" emoji="📄" />
-                    <div>
+                <div style={{ marginTop: '8px' }}>
+                    <SectionHeader title="記録情報" icon={File} />
+                    <div style={{ 
+                        background: 'white',
+                        borderRadius: '0 0 12px 12px',
+                        margin: '0 12px',
+                        marginBottom: '8px'
+                    }}>
                         {/* Resume */}
                         <input
                             ref={resumeInputRef}
@@ -606,7 +633,7 @@ const ProfilePage = ({ onNavigate }) => {
 };
 
 // Section Header Component
-const SectionHeader = ({ title, emoji }) => (
+const SectionHeader = ({ title, icon: Icon }) => (
     <div style={{
         background: '#007AFF',
         color: 'white',
@@ -615,9 +642,12 @@ const SectionHeader = ({ title, emoji }) => (
         fontWeight: 'bold',
         display: 'flex',
         alignItems: 'center',
-        gap: '6px'
+        gap: '6px',
+        borderRadius: '12px 12px 0 0',
+        margin: '0 12px',
+        marginTop: '8px'
     }}>
-        <span style={{ fontSize: '14px' }}>{emoji}</span>
+        {Icon && <Icon size={16} />}
         {title}
     </div>
 );

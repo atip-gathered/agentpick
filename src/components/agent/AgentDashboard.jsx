@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { TrendingUp, MessageCircle, Users, Heart } from 'lucide-react';
+import ChildAccountManagement from './ChildAccountManagement';
 
-const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
+const AgentDashboard = ({ agentData, matchedUsers, messages, childAgents, onCreateChild, onUpdateChild, onDeleteChild, onAssignUser }) => {
     const [hoveredCard, setHoveredCard] = useState(null);
 
     // Calculate statistics
@@ -305,6 +306,17 @@ const AgentDashboard = ({ agentData, matchedUsers, messages }) => {
                     </div>
                 )}
             </div>
+
+            {/* Child Account Management - Only for Parent Accounts */}
+            {agentData.isParentAccount && (
+                <ChildAccountManagement
+                    childAgents={childAgents}
+                    onCreateChild={onCreateChild}
+                    onUpdateChild={onUpdateChild}
+                    onDeleteChild={onDeleteChild}
+                    onAssignUser={onAssignUser}
+                />
+            )}
         </div>
     );
 };

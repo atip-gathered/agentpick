@@ -15,6 +15,15 @@ import ProfilePage from './components/ProfilePage';
 import SearchPage from './components/SearchPage';
 import FeaturedArticlesPage from './components/FeaturedArticlesPage';
 import ArticleDetailPage from './components/ArticleDetailPage';
+import AgentLoginPage from './components/agent/AgentLoginPage';
+import AgentLayout from './components/agent/AgentLayout';
+import AgentDashboard from './components/agent/AgentDashboard';
+import AgentMessages from './components/agent/AgentMessages';
+import AgentProfile from './components/agent/AgentProfile';
+import AgentMatching from './components/agent/AgentMatching';
+import UserProfileModal from './components/agent/UserProfileModal';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
+import AgentForgotPasswordPage from './components/agent/AgentForgotPasswordPage';
 import { agents } from './mockData';
 
 function App() {
@@ -28,9 +37,90 @@ function App() {
     const [currentChatAgent, setCurrentChatAgent] = useState(null);
 
     // Navigation State
-    const [currentView, setCurrentView] = useState('landing'); // 'landing', 'swipe', 'detail', 'completion', 'login', 'register', 'messages', 'chat', 'search', 'articles', 'article-detail'
+    const [currentView, setCurrentView] = useState('landing'); // 'landing', 'swipe', 'detail', 'completion', 'login', 'register', 'messages', 'chat', 'search', 'articles', 'article-detail', 'agent-login', 'agent-dashboard'
     const [selectedAgent, setSelectedAgent] = useState(null);
     const [selectedArticle, setSelectedArticle] = useState(null);
+    
+    // Agent Mode State
+    const [isAgentMode, setIsAgentMode] = useState(false);
+    const [agentData, setAgentData] = useState(null);
+    const [agentActiveTab, setAgentActiveTab] = useState('dashboard');
+    const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+    const [childAgents, setChildAgents] = useState([]);
+    
+    // Child Agent Management Handlers
+    const handleCreateChildAgent = (childData) => {
+        const newChild = {
+            id: `child-${Date.now()}`,
+            ...childData,
+            status: 'active',
+            createdAt: new Date().toISOString(),
+            assignedUsers: []
+        };
+        setChildAgents(prev => [...prev, newChild]);
+    };
+
+    const handleUpdateChildAgent = (childId, updatedData) => {
+        setChildAgents(prev => 
+            prev.map(child => 
+                child.id === childId ? { ...child, ...updatedData } : child
+            )
+        );
+    };
+
+    const handleDeleteChildAgent = (childId) => {
+        setChildAgents(prev => prev.filter(child => child.id !== childId));
+    };
+
+    const handleAssignUserToChild = (userId, childId) => {
+        setChildAgents(prev =>
+            prev.map(child =>
+                child.id === childId
+                    ? { ...child, assignedUsers: [...(child.assignedUsers || []), userId] }
+                    : child
+            )
+        );
+    };
+    
+    // Mock matched users data for agent
+    const [matchedUsers, setMatchedUsers] = useState([
+        { 
+            id: 1, 
+            name: '田中 太郎', 
+            position: 'ソフトウェアエンジニア',
+            email: 'tanaka@example.com',
+            phone: '090-1234-5678',
+            status: 'active',
+            matchedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            desiredPosition: 'シニアエンジニア',
+            hasProfileAccess: false,
+            resume: 'Tanaka_履歴書.pdf',
+            workHistory: 'Tanaka_職務経歴書.pdf',
+            birthDate: '1995/03/15',
+            age: '29歳',
+            gender: '男性',
+            location: '東京都',
+            education: '早稲田大学 理工学部 卒業'
+        },
+        { 
+            id: 2, 
+            name: '佐藤 花子', 
+            position: 'プロジェクトマネージャー',
+            email: 'sato@example.com',
+            phone: '090-2345-6789',
+            status: 'in_progress',
+            matchedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+            desiredPosition: 'シニアPM',
+            hasProfileAccess: true,
+            resume: 'Sato_履歴書.pdf',
+            workHistory: 'Sato_職務経歴書.pdf',
+            birthDate: '1992/07/20',
+            age: '32歳',
+            gender: '女性',
+            location: '神奈川県',
+            education: '慶應義塾大学 商学部 卒業'
+        }
+    ]);
     const activeTab = currentView === 'swipe' ? 'swipe' :
         currentView === 'search' ? 'search' :
             currentView === 'detail' || currentView === 'completion' || currentView === 'articles' || currentView === 'article-detail' ? 'detail' :
@@ -47,12 +137,13 @@ function App() {
         setMatchedAgents(prev => [...prev, agent.id]);
     };
 
-    const handleSendMessage = (agentId, text, type = 'text') => {
+    const handleSendMessage = (agentId, text, type = 'text', sender = 'user') => {
         const newMessage = {
-            sender: 'user',
+            sender: sender,
             text: text,
             type: type,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            read: false
         };
 
         setMessages(prev => ({
@@ -60,14 +151,26 @@ function App() {
             [agentId]: [...(prev[agentId] || []), newMessage]
         }));
 
-        // Simulate agent response after 1 second (only for text messages)
-        if (type === 'text') {
+        // If user sends first message, grant profile access to agent
+        if (sender === 'user') {
+            setMatchedUsers(prev => 
+                prev.map(user => 
+                    user.id === agentId && !user.hasProfileAccess
+                        ? { ...user, hasProfileAccess: true }
+                        : user
+                )
+            );
+        }
+
+        // Simulate agent response after 1 second (only for text messages from user)
+        if (type === 'text' && sender === 'user') {
             setTimeout(() => {
                 const agentResponse = {
                     sender: 'agent',
                     text: 'ご連絡ありがとうございます。詳細についてお話しさせていただきます。',
                     type: 'text',
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    read: false
                 };
 
                 setMessages(prev => ({
@@ -167,6 +270,7 @@ function App() {
                     onStartSwipe={() => setCurrentView('swipe')}
                     onLogin={() => setCurrentView('login')}
                     onRegister={() => setCurrentView('register')}
+                    onAgentLogin={() => setCurrentView('agent-login')}
                 />
             )}
 
@@ -185,7 +289,12 @@ function App() {
                 }}
             />
 
-            {currentView !== 'landing' && currentView !== 'chat' && (
+            {currentView !== 'landing' && 
+             currentView !== 'chat' && 
+             currentView !== 'agent-login' && 
+             currentView !== 'agent-dashboard' &&
+             currentView !== 'agent-forgot-password' &&
+             currentView !== 'forgot-password' && (
                 <Layout
                     activeTab={activeTab}
                     onLogoClick={() => setCurrentView('landing')}
@@ -278,6 +387,46 @@ function App() {
                         />
                     )}
 
+                    {currentView === 'agent-login' && (
+                        <AgentLoginPage
+                            onLogin={(credentials) => {
+                                console.log('Agent logged in:', credentials);
+                                // Set agent data
+                                setAgentData({
+                                    name: credentials.email === 'matsumoto@atip.co.jp' ? '松本 太郎' : 'エージェント',
+                                    email: credentials.email,
+                                    company: 'Atip株式会社',
+                                    location: '東京都',
+                                    specialty: ['IT・Web', 'コンサルティング', 'マーケティング'],
+                                    bio: 'IT業界を中心に、10年以上の転職支援実績があります。',
+                                    phone: '03-1234-5678',
+                                    image: '/api/placeholder/120/120',
+                                    isParentAccount: credentials.email === 'matsumoto@atip.co.jp',
+                                    achievements: [
+                                        { title: '年間MVP受賞', description: '2023年度、最優秀転職支援賞を受賞' }
+                                    ]
+                                });
+                                setIsAgentMode(true);
+                                setAgentActiveTab('dashboard');
+                                setCurrentView('agent-dashboard');
+                            }}
+                            onBack={() => setCurrentView('landing')}
+                            onForgotPassword={() => setCurrentView('agent-forgot-password')}
+                        />
+                    )}
+
+                    {currentView === 'agent-forgot-password' && (
+                        <AgentForgotPasswordPage
+                            onBack={() => setCurrentView('agent-login')}
+                        />
+                    )}
+
+                    {currentView === 'forgot-password' && (
+                        <ForgotPasswordPage
+                            onBack={() => setCurrentView('login')}
+                        />
+                    )}
+
                     {currentView === 'messages' && (
                         <MessageList
                             pickedAgents={agents.filter(a => matchedAgents.includes(a.id))}
@@ -350,6 +499,78 @@ function App() {
                     onBack={() => setCurrentView('messages')}
                     messages={messages[currentChatAgent.id] || []}
                     onSendMessage={handleSendMessage}
+                />
+            )}
+
+            {/* Agent Mode - Complete separate UI */}
+            {isAgentMode && currentView === 'agent-dashboard' && agentData && (
+                <AgentLayout
+                    activeTab={agentActiveTab}
+                    onNavigate={(tab) => setAgentActiveTab(tab)}
+                    onLogout={() => {
+                        setIsAgentMode(false);
+                        setAgentData(null);
+                        setAgentActiveTab('dashboard');
+                        setCurrentView('landing');
+                    }}
+                    agentName={agentData.name}
+                    unreadCount={messages ? Object.values(messages).reduce((sum, msgs) => 
+                        sum + msgs.filter(msg => msg.sender === 'user' && !msg.read).length, 0
+                    ) : 0}
+                >
+                    {agentActiveTab === 'dashboard' && (
+                        <AgentDashboard 
+                            agentData={agentData}
+                            matchedUsers={matchedUsers}
+                            messages={messages}
+                            childAgents={childAgents}
+                            onCreateChild={handleCreateChildAgent}
+                            onUpdateChild={handleUpdateChildAgent}
+                            onDeleteChild={handleDeleteChildAgent}
+                            onAssignUser={handleAssignUserToChild}
+                        />
+                    )}
+                    
+                    {agentActiveTab === 'messages' && (
+                        <AgentMessages
+                            matchedUsers={matchedUsers}
+                            messages={messages}
+                            onSendMessage={handleSendMessage}
+                            onViewProfile={(user) => {
+                                setSelectedUserProfile(user);
+                            }}
+                        />
+                    )}
+                    
+                    {agentActiveTab === 'matching' && (
+                        <AgentMatching
+                            matchedUsers={matchedUsers}
+                        />
+                    )}
+                    
+                    {agentActiveTab === 'profile' && (
+                        <AgentProfile
+                            agentData={agentData}
+                            onSave={(updatedData) => {
+                                setAgentData(updatedData);
+                            }}
+                        />
+                    )}
+                </AgentLayout>
+            )}
+
+            {/* User Profile Modal */}
+            {selectedUserProfile && (
+                <UserProfileModal
+                    user={selectedUserProfile}
+                    onClose={() => setSelectedUserProfile(null)}
+                    onStatusChange={(userId, newStatus) => {
+                        setMatchedUsers(prev => 
+                            prev.map(user => 
+                                user.id === userId ? { ...user, status: newStatus } : user
+                            )
+                        );
+                    }}
                 />
             )}
         </>
