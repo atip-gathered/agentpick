@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Volume2, ThumbsUp } from 'lucide-react';
 import { Facebook, Instagram, Linkedin } from 'lucide-react';
+import { agents } from '../mockData';
 
 const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = false, onNavigateToRegister, matchedAgents = [], onPickAgent }) => {
     const [hoveredButton, setHoveredButton] = useState(null);
@@ -8,9 +9,14 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
     const [hoveredSocial, setHoveredSocial] = useState(null);
     const [hoveredArticle, setHoveredArticle] = useState(null);
     
-    // Featured agent (example: agent ID 1 - Yamada Akiko)
-    const featuredAgentId = 1;
+    // Featured agent from article data
+    const featuredAgentId = article?.featuredAgentId || 1;
+    const featuredAgent = agents.find(a => a.id === featuredAgentId) || agents[0];
     const isPicked = matchedAgents.includes(featuredAgentId);
+    
+    // Table of contents and sections from article
+    const tableOfContents = article?.tableOfContents || [];
+    const sections = article?.sections || [];
     
     const handlePickAgent = () => {
         if (!isPicked && onPickAgent) {
@@ -103,10 +109,12 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                         fontWeight: '600',
                         fontSize: '11px'
                     }}>
-                        新卒採用
+                        {article?.tag || '新着記事'}
                     </span>
-                    <span>投稿日：25.05.30</span>
-                    <span>更新日：25.05.25</span>
+                    <span>投稿日：{article?.date || '2024.12.15'}</span>
+                    {article?.updatedAt && (
+                        <span>更新日：{new Date(article.updatedAt).toISOString().split('T')[0].replace(/-/g, '.')}</span>
+                    )}
                 </div>
 
                 {/* Title */}
@@ -117,7 +125,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                     lineHeight: '1.4',
                     margin: 0
                 }}>
-                    IT業界の最新動向と転職市場
+                    {article?.title || 'IT業界の最新動向と転職市場'}
                 </h2>
             </div>
 
@@ -151,11 +159,12 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                     lineHeight: '1.8',
                     margin: 0
                 }}>
-                    IT業界の技術革新や市場変化を踏まえ、求められるスキルや人材像を分析。最新の転職市場動向を俯瞰し、今後のキャリア戦略を考察します。
+                    {article?.description || 'IT業界の技術革新や市場変化を踏まえ、求められるスキルや人材像を分析。最新の転職市場動向を俯瞰し、今後のキャリア戦略を考察します。'}
                 </p>
             </div>
 
-            {/* Agent Info Card */}
+            {/* Agent Info Card - Only show for Interview articles */}
+            {article?.tag === 'インタビュー' && article?.featuredAgentId && (
             <div style={{
                 background: '#E3F2FD',
                 borderRadius: '16px',
@@ -188,7 +197,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                     marginBottom: '24px'
                 }}>
                     <img
-                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&q=80"
+                        src={featuredAgent?.image || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&q=80"}
                         alt="Agent"
                         style={{
                             width: '70px',
@@ -206,7 +215,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                             marginBottom: '6px',
                             fontWeight: '500'
                         }}>
-                            パーソルキャリア（doda）
+                            {featuredAgent?.company || 'パーソルキャリア（doda）'}
                         </div>
                         <div style={{
                             fontSize: '20px',
@@ -214,7 +223,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                             color: '#1a1a2e',
                             letterSpacing: '0.5px'
                         }}>
-                            山田 明子
+                            {featuredAgent?.name || '山田 明子'}
                         </div>
                     </div>
                 </div>
@@ -291,195 +300,100 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                     プロフィールを見る
                 </div>
             </div>
+            )}
 
             {/* Table of Contents */}
-            <div style={{
-                background: 'white',
-                padding: '24px 20px',
-                marginBottom: '8px',
-                margin: '0 16px 16px 16px',
-                borderRadius: '12px',
-                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)'
-            }}>
-                <h3 style={{
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    color: '#1a1a2e',
-                    marginBottom: '20px',
-                    letterSpacing: '0.5px'
-                }}>
-                    目次
-                </h3>
-                <ul style={{
-                    listStyle: 'none',
-                    padding: 0,
-                    margin: 0
-                }}>
-                    {[
-                        { text: '転職エージェントになったきっかけ', id: 'section-1' },
-                        { text: '支社長として目指すもの', id: 'section-2' },
-                        { text: '後輩エージェントへのメッセージ', id: 'section-3' },
-                        { text: 'プライベートとの両立', id: 'section-4' }
-                    ].map((item, index) => (
-                        <li
-                            key={index}
-                            onClick={() => scrollToSection(item.id)}
-                            onMouseEnter={() => setHoveredTocItem(index)}
-                            onMouseLeave={() => setHoveredTocItem(null)}
-                            style={{
-                                fontSize: '16px',
-                                color: '#1a1a2e',
-                                marginBottom: index === 3 ? 0 : '16px',
-                                paddingLeft: '24px',
-                                position: 'relative',
-                                cursor: 'pointer',
-                                lineHeight: '1.6',
-                                transition: 'all 0.2s ease',
-                                opacity: hoveredTocItem === index ? 0.7 : 1
-                            }}
-                        >
-                            <span style={{
-                                position: 'absolute',
-                                left: 0,
-                                top: '4px',
-                                width: '8px',
-                                height: '8px',
-                                borderRadius: '50%',
-                                background: '#007AFF'
-                            }} />
-                            {item.text}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            {/* Content Section 1 */}
-            <div
-                id="section-1"
-                style={{
+            {tableOfContents.length > 0 && (
+                <div style={{
                     background: 'white',
-                    padding: '20px 16px',
+                    padding: '24px 20px',
                     marginBottom: '8px',
-                    scrollMarginTop: '60px'
-                }}
-            >
-                <h3 style={{
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    color: '#007AFF',
-                    marginBottom: '16px'
+                    margin: '0 16px 16px 16px',
+                    borderRadius: '12px',
+                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)'
                 }}>
-                    転職エージェントになったきっかけ
-                </h3>
-                <p style={{
-                    fontSize: '14px',
-                    color: '#333',
-                    lineHeight: '1.8',
-                    margin: 0
-                }}>
-                    大学卒業後、人材業界とは全く縁のない金融業界でキャリアをスタートしました。お客様の資産運用のサポートをする中で、「人生の転機に寄り添い、サポートする」という仕事の面白さに気づいたんです。そこから転職支援の道に興味を持ち、25歳の時に人材サービス会社に転職しました。<br /><br />
-                    
-                    最初は営業として企業の採用支援に携わっていましたが、次第に求職者の方々と直接向き合う仕事がしたいと思うようになり、転職エージェントとしてのキャリアをスタートさせました。今振り返ると、自分自身が転職という大きな決断をした経験が、この仕事への情熱につながっているのだと感じます。
-                </p>
-            </div>
+                    <h3 style={{
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        color: '#1a1a2e',
+                        marginBottom: '20px',
+                        letterSpacing: '0.5px'
+                    }}>
+                        目次
+                    </h3>
+                    <ul style={{
+                        listStyle: 'none',
+                        padding: 0,
+                        margin: 0
+                    }}>
+                        {tableOfContents.map((item, index) => (
+                            <li
+                                key={index}
+                                onClick={() => scrollToSection(`section-${index}`)}
+                                onMouseEnter={() => setHoveredTocItem(index)}
+                                onMouseLeave={() => setHoveredTocItem(null)}
+                                style={{
+                                    fontSize: '16px',
+                                    color: '#1a1a2e',
+                                    marginBottom: index === tableOfContents.length - 1 ? 0 : '16px',
+                                    paddingLeft: '24px',
+                                    position: 'relative',
+                                    cursor: 'pointer',
+                                    lineHeight: '1.6',
+                                    transition: 'all 0.2s ease',
+                                    opacity: hoveredTocItem === index ? 0.7 : 1
+                                }}
+                            >
+                                <span style={{
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: '4px',
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    background: '#007AFF'
+                                }} />
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
-            {/* Content Section 2 */}
-            <div
-                id="section-2"
-                style={{
-                    background: 'white',
-                    padding: '20px 16px',
-                    marginBottom: '8px',
-                    scrollMarginTop: '60px'
-                }}
-            >
-                <h3 style={{
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    color: '#007AFF',
-                    marginBottom: '16px'
-                }}>
-                    支社長として目指すもの
-                </h3>
-                <p style={{
-                    fontSize: '14px',
-                    color: '#333',
-                    lineHeight: '1.8',
-                    margin: 0
-                }}>
-                    支社長として最も大切にしているのは、「チーム全体の成長」です。一人ひとりのエージェントが自信を持って求職者の方々をサポートできる環境を作ることが、私の使命だと考えています。<br /><br />
-                    
-                    具体的には、定期的な1on1ミーティングを通じて各メンバーの強みを伸ばし、課題を一緒に解決していくことを心がけています。また、成功事例を共有する文化を醸成し、お互いに学び合える組織づくりにも力を入れています。<br /><br />
-                    
-                    私たちの仕事は、人の人生に大きな影響を与える責任ある仕事です。だからこそ、エージェント一人ひとりが高い専門性と誠実さを持って求職者に向き合える、そんなチームを作っていきたいと思っています。
-                </p>
-            </div>
+            {/* Content Sections - Dynamic from article data */}
+            {sections.map((section, index) => (
+                <div
+                    key={index}
+                    id={`section-${index}`}
+                    style={{
+                        background: 'white',
+                        padding: '20px 16px',
+                        marginBottom: index === sections.length - 1 ? '20px' : '8px',
+                        scrollMarginTop: '60px'
+                    }}
+                >
+                    <h3 style={{
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        color: '#007AFF',
+                        marginBottom: '16px'
+                    }}>
+                        {section.title}
+                    </h3>
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#333',
+                        lineHeight: '1.8',
+                        margin: 0,
+                        whiteSpace: 'pre-wrap'
+                    }}>
+                        {section.content}
+                    </p>
+                </div>
+            ))}
 
-            {/* Content Section 3 */}
-            <div
-                id="section-3"
-                style={{
-                    background: 'white',
-                    padding: '20px 16px',
-                    marginBottom: '8px',
-                    scrollMarginTop: '60px'
-                }}
-            >
-                <h3 style={{
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    color: '#007AFF',
-                    marginBottom: '16px'
-                }}>
-                    後輩エージェントへのメッセージ
-                </h3>
-                <p style={{
-                    fontSize: '14px',
-                    color: '#333',
-                    lineHeight: '1.8',
-                    margin: 0
-                }}>
-                    転職エージェントとして働き始めた頃は、誰もが不安を感じるものです。私もそうでした。でも、大切なのは「求職者の人生に真摯に向き合う」という気持ちを忘れないことです。<br /><br />
-                    
-                    最初はうまく話せなかったり、適切なアドバイスができなかったりすることもあるかもしれません。でも、その経験一つひとつが必ず成長につながります。失敗を恐れず、常に学び続ける姿勢を持ち続けてください。<br /><br />
-                    
-                    そして、困った時は一人で抱え込まず、チームのメンバーや先輩に相談してください。私たちは一つのチームです。一緒に成長していきましょう。
-                </p>
-            </div>
-
-            {/* Content Section 4 */}
-            <div
-                id="section-4"
-                style={{
-                    background: 'white',
-                    padding: '20px 16px',
-                    marginBottom: '20px',
-                    scrollMarginTop: '60px'
-                }}
-            >
-                <h3 style={{
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    color: '#007AFF',
-                    marginBottom: '16px'
-                }}>
-                    プライベートとの両立
-                </h3>
-                <p style={{
-                    fontSize: '14px',
-                    color: '#333',
-                    lineHeight: '1.8',
-                    margin: 0
-                }}>
-                    正直に言うと、仕事とプライベートの両立は簡単ではありません。特に支社長という立場になってからは、責任も増え、時間のやりくりに苦労することもあります。<br /><br />
-                    
-                    でも、だからこそ意識的にメリハリをつけることを大切にしています。休日は家族との時間を最優先にし、趣味のヨガでリフレッシュする時間も確保するようにしています。オンとオフを切り替えることで、仕事でのパフォーマンスも向上すると実感しています。<br /><br />
-                    
-                    また、チームメンバーにも同じことを伝えています。長時間働くことが良いことではなく、効率的に働き、自分の時間も大切にすることが、結果的に良い仕事につながると信じています。
-                </p>
-            </div>
-
-            {/* Agent Info Card (Second appearance at bottom) */}
+            {/* Agent Info Card (Second appearance at bottom) - Only show for Interview articles */}
+            {article?.tag === 'インタビュー' && article?.featuredAgentId && (
             <div style={{
                 background: '#E3F2FD',
                 borderRadius: '16px',
@@ -512,7 +426,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                     marginBottom: '24px'
                 }}>
                     <img
-                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&q=80"
+                        src={featuredAgent?.image || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=120&q=80"}
                         alt="Agent"
                         style={{
                             width: '70px',
@@ -530,7 +444,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                             marginBottom: '6px',
                             fontWeight: '500'
                         }}>
-                            パーソルキャリア（doda）
+                            {featuredAgent?.company || 'パーソルキャリア（doda）'}
                         </div>
                         <div style={{
                             fontSize: '20px',
@@ -538,7 +452,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                             color: '#1a1a2e',
                             letterSpacing: '0.5px'
                         }}>
-                            山田 明子
+                            {featuredAgent?.name || '山田 明子'}
                         </div>
                     </div>
                 </div>
@@ -615,6 +529,7 @@ const ArticleDetailPage = ({ article, onBack, onNavigateToAgent, isLoggedIn = fa
                     プロフィールを見る
                 </div>
             </div>
+            )}
 
             {/* Social Share Section */}
             <div style={{

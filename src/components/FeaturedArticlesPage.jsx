@@ -1,54 +1,35 @@
 import React, { useState } from 'react';
 
-const FeaturedArticlesPage = ({ onNavigateToDetail, onNavigateToSwipe }) => {
+const FeaturedArticlesPage = ({ articles = [], onNavigateToDetail, onNavigateToSwipe }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [hoveredCard, setHoveredCard] = useState(null);
     const [hoveredButton, setHoveredButton] = useState(false);
-    const totalPages = 12;
     const articlesPerPage = 5;
 
-    // Sample article data - matching the screenshot
-    const recommendedArticles = [
-        {
-            id: 1,
-            author: '山田 明子',
-            title: 'IT業界の最新動向と転職市場',
-            description: 'IT業界の最新動向と転職市場の状況を詳しく分析します',
-            category: '新着記事',
-            image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-        },
-        {
-            id: 2,
-            author: '山田 明子',
-            title: 'IT業界の最新動向と転職市場',
-            description: 'IT業界の最新動向と転職市場の状況を詳しく分析します',
-            category: '新着記事',
-            image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-        },
-        {
-            id: 3,
-            author: '山田 明子',
-            title: 'IT業界の最新動向と転職市場',
-            description: 'IT業界の最新動向と転職市場の状況を詳しく分析します',
-            category: '新着記事',
-            image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-        }
-    ];
+    // Sort articles by date (newest first) and filter published only
+    const publishedArticles = articles
+        .filter(article => article.isPublished)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    // Generate article data for all pages (12 pages * 5 articles per page = 60 articles)
-    const allLatestArticles = Array.from({ length: totalPages * articlesPerPage }, (_, index) => ({
-        id: index + 4,
-        author: '山田 明子',
-        title: `IT業界の最新動向と転職市場 (記事 ${index + 1})`,
-        description: 'IT業界の最新動向と転職市場の状況を詳しく分析します',
-        categories: index % 2 === 0 ? ['新着記事', '中途採用'] : ['中途採用', '新着記事'],
-        image: index % 3 === 0 
-            ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-            : index % 3 === 1
-            ? 'https://images.unsplash.com/photo-1556157382-97eda2d62296?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-            : 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+    // Recommended articles (top 3 most viewed or featured)
+    const recommendedArticles = publishedArticles
+        .slice(0, 3)
+        .map(article => ({
+            ...article,
+            category: article.tag || '新着記事',
+            image: article.image || 'https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?auto=format&fit=crop&w=800&q=80'
+        }));
+
+    // All articles for pagination
+    const allLatestArticles = publishedArticles.map(article => ({
+        ...article,
+        categories: [article.tag || '新着記事', '中途採用'],
+        image: article.image || 'https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?auto=format&fit=crop&w=800&q=80'
     }));
+
+    // Calculate total pages
+    const totalPages = Math.max(1, Math.ceil(allLatestArticles.length / articlesPerPage));
 
     // Get articles for current page
     const startIndex = (currentPage - 1) * articlesPerPage;
