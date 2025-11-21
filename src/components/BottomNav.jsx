@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ThumbsUp, Search, MessageCircle, BookOpen, User } from 'lucide-react';
 
 const BottomNav = ({ activeTab, onNavigate }) => {
+    const [hoveredTab, setHoveredTab] = useState(null);
     const tabs = [
         { id: 'swipe', icon: ThumbsUp, label: 'ピック' },
         { id: 'search', icon: Search, label: '探す' },
@@ -35,13 +36,17 @@ const BottomNav = ({ activeTab, onNavigate }) => {
                     <div
                         key={tab.id}
                         onClick={() => onNavigate && onNavigate(tab.id)}
+                        onMouseEnter={() => setHoveredTab(tab.id)}
+                        onMouseLeave={() => setHoveredTab(null)}
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             gap: '4px',
                             cursor: onNavigate ? 'pointer' : 'default',
-                            color: isActive ? '#007AFF' : '#8E8E93'
+                            color: isActive ? '#007AFF' : '#8E8E93',
+                            opacity: hoveredTab === tab.id && !isActive ? 0.7 : 1,
+                            transition: 'opacity 0.2s ease'
                         }}
                     >
                         <Icon size={24} fill={isActive ? '#007AFF' : 'none'} strokeWidth={2} />

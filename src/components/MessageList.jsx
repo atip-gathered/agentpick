@@ -2,9 +2,17 @@ import React, { useState } from 'react';
 import { MessageCircle, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat }) => {
+const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat, messages = {} }) => {
     const [bulkMode, setBulkMode] = useState(false);
     const [selectedAgents, setSelectedAgents] = useState([]);
+    const [hoveredButton, setHoveredButton] = useState(null); // Track hover state
+    
+    // Helper function to get the latest message for an agent
+    const getLatestMessage = (agentId) => {
+        const agentMessages = messages[agentId] || [];
+        if (agentMessages.length === 0) return null;
+        return agentMessages[agentMessages.length - 1];
+    };
 
     const toggleBulkMode = () => {
         setBulkMode(!bulkMode);
@@ -156,26 +164,51 @@ const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat }) => {
                                     }}>
                                         {agent.name}
                                     </div>
-                                    {!bulkMode && (
-                                        <div style={{
-                                            fontSize: '12px',
-                                            color: '#8E8E93',
-                                            marginTop: '4px',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
-                                        }}>
-                                            {agent.specialty.slice(0, 2).join('、')}
-                                        </div>
-                                    )}
+                                    {!bulkMode && (() => {
+                                        const latestMessage = getLatestMessage(agent.id);
+                                        return (
+                                            <div style={{
+                                                fontSize: '12px',
+                                                color: '#8E8E93',
+                                                marginTop: '4px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap'
+                                            }}>
+                                                {latestMessage ? (
+                                                    <>
+                                                        <span style={{ 
+                                                            fontWeight: latestMessage.sender === 'agent' ? 'normal' : '600',
+                                                            color: latestMessage.sender === 'user' ? '#333' : '#8E8E93'
+                                                        }}>
+                                                            {latestMessage.sender === 'agent' ? '' : 'あなた: '}
+                                                        </span>
+                                                        {latestMessage.type === 'text' 
+                                                            ? latestMessage.text 
+                                                            : latestMessage.type === 'audio' 
+                                                                ? '🎤 音声メッセージ' 
+                                                                : '📎 ファイル'}
+                                                    </>
+                                                ) : (
+                                                    agent.specialty.slice(0, 2).join('、')
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
 
                                 {/* Action Button */}
                                 {bulkMode ? (
                                     <button
                                         onClick={() => toggleAgentSelection(agent.id)}
+                                        onMouseEnter={() => setHoveredButton(`select-${agent.id}`)}
+                                        onMouseLeave={() => setHoveredButton(null)}
                                         style={{
-                                            background: isSelected ? 'white' : '#007AFF',
+                                            background: isSelected 
+                                                ? 'white' 
+                                                : hoveredButton === `select-${agent.id}`
+                                                    ? '#0056B3'
+                                                    : '#007AFF',
                                             color: isSelected ? '#007AFF' : 'white',
                                             border: isSelected ? '2px solid #007AFF' : 'none',
                                             padding: '8px 16px',
@@ -183,7 +216,8 @@ const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat }) => {
                                             fontSize: '14px',
                                             fontWeight: 'bold',
                                             cursor: 'pointer',
-                                            whiteSpace: 'nowrap'
+                                            whiteSpace: 'nowrap',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         {isSelected ? '選択解除' : '選択する'}
@@ -191,8 +225,12 @@ const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat }) => {
                                 ) : (
                                     <button
                                         onClick={() => onNavigateToChat(agent.id)}
+                                        onMouseEnter={() => setHoveredButton(`message-${agent.id}`)}
+                                        onMouseLeave={() => setHoveredButton(null)}
                                         style={{
-                                            background: '#007AFF',
+                                            background: hoveredButton === `message-${agent.id}`
+                                                ? '#0056B3'
+                                                : '#007AFF',
                                             color: 'white',
                                             border: 'none',
                                             padding: '8px 16px',
@@ -200,7 +238,8 @@ const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat }) => {
                                             fontSize: '14px',
                                             fontWeight: 'bold',
                                             cursor: 'pointer',
-                                            whiteSpace: 'nowrap'
+                                            whiteSpace: 'nowrap',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         メッセージする
@@ -221,9 +260,13 @@ const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat }) => {
                 }}>
                     <button
                         onClick={handleSendBulkMessage}
+                        onMouseEnter={() => setHoveredButton('bulk-send')}
+                        onMouseLeave={() => setHoveredButton(null)}
                         style={{
                             width: '100%',
-                            background: '#FF9500',
+                            background: hoveredButton === 'bulk-send'
+                                ? '#E68500'
+                                : '#FF9500',
                             color: 'white',
                             border: 'none',
                             padding: '16px',
@@ -231,7 +274,8 @@ const MessageList = ({ pickedAgents, onStartChat, onNavigateToChat }) => {
                             fontSize: '16px',
                             fontWeight: 'bold',
                             cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(255,149,0,0.3)'
+                            boxShadow: '0 4px 12px rgba(255,149,0,0.3)',
+                            transition: 'all 0.2s ease'
                         }}
                     >
                         まとめてメッセージを送る

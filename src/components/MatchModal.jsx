@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X } from 'lucide-react';
 
 const MatchModal = ({ isOpen, onClose, agent }) => {
+    const [hoveredButton, setHoveredButton] = useState(null);
+    
     if (!agent) return null;
 
     return (
@@ -78,34 +80,46 @@ const MatchModal = ({ isOpen, onClose, agent }) => {
                             You and <strong>{agent.name}</strong> have liked each other.
                         </p>
 
-                        <button style={{
-                            width: '100%',
-                            padding: '16px',
-                            borderRadius: '100px',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            color: 'white',
-                            fontSize: '16px',
-                            fontWeight: 'bold',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            marginBottom: '16px'
-                        }}>
+                        <button
+                            onMouseEnter={() => setHoveredButton('message')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            style={{
+                                width: '100%',
+                                padding: '16px',
+                                borderRadius: '100px',
+                                background: hoveredButton === 'message' ? 'linear-gradient(135deg, #5568d3 0%, #63408a 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                color: 'white',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                marginBottom: '16px',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer',
+                                border: 'none'
+                            }}
+                        >
                             <MessageCircle size={20} />
                             Send Message
                         </button>
 
                         <button
                             onClick={onClose}
+                            onMouseEnter={() => setHoveredButton('keep-swiping')}
+                            onMouseLeave={() => setHoveredButton(null)}
                             style={{
                                 width: '100%',
                                 padding: '16px',
                                 borderRadius: '100px',
-                                background: 'rgba(255,255,255,0.1)',
+                                background: hoveredButton === 'keep-swiping' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
                                 color: 'white',
                                 fontSize: '16px',
-                                fontWeight: 'bold'
+                                fontWeight: 'bold',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer',
+                                border: 'none'
                             }}
                         >
                             Keep Swiping

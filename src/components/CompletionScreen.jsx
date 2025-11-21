@@ -26,47 +26,37 @@ const CompletionScreen = ({ onReset }) => {
             </p>
 
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <button style={{
-                    width: '100%',
-                    padding: '16px',
-                    background: '#007AFF',
-                    color: 'white',
-                    borderRadius: '100px',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px'
-                }}>
+                <button
+                    onMouseEnter={() => setHoveredButton('message')}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    style={{
+                        width: '100%',
+                        padding: '16px',
+                        background: hoveredButton === 'message' ? '#0062CC' : '#007AFF',
+                        color: 'white',
+                        borderRadius: '100px',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer',
+                        border: 'none'
+                    }}
+                >
                     <MessageCircle size={20} />
                     ピックしたエージェントに<br />メッセージを送る
                 </button>
 
-                <button style={{
-                    width: '100%',
-                    padding: '16px',
-                    background: 'white',
-                    color: '#007AFF',
-                    border: '1px solid #E5E5EA',
-                    borderRadius: '100px',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px'
-                }}>
-                    <Search size={20} />
-                    条件を絞ってエージェントを探す
-                </button>
-
                 <button
-                    onClick={onReset}
+                    onMouseEnter={() => setHoveredButton('search')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         width: '100%',
                         padding: '16px',
-                        background: 'white',
+                        background: hoveredButton === 'search' ? '#F5F5F5' : 'white',
                         color: '#007AFF',
                         border: '1px solid #E5E5EA',
                         borderRadius: '100px',
@@ -75,7 +65,34 @@ const CompletionScreen = ({ onReset }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer'
+                    }}
+                >
+                    <Search size={20} />
+                    条件を絞ってエージェントを探す
+                </button>
+
+                <button
+                    onClick={onReset}
+                    onMouseEnter={() => setHoveredButton('reset')}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    style={{
+                        width: '100%',
+                        padding: '16px',
+                        background: hoveredButton === 'reset' ? '#F5F5F5' : 'white',
+                        color: '#007AFF',
+                        border: '1px solid #E5E5EA',
+                        borderRadius: '100px',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer'
                     }}
                 >
                     <RefreshCw size={20} />

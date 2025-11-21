@@ -4,6 +4,7 @@ import { ChevronLeft, Paperclip, Image as ImageIcon, Send } from 'lucide-react';
 const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
     const [inputText, setInputText] = useState('');
     const [unreadCount] = useState(2); // For demonstration
+    const [hoveredIcon, setHoveredIcon] = useState(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     const imageInputRef = useRef(null);
@@ -76,7 +77,13 @@ const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
                 <ChevronLeft
                     size={24}
                     onClick={onBack}
-                    style={{ cursor: 'pointer' }}
+                    onMouseEnter={() => setHoveredIcon('back')}
+                    onMouseLeave={() => setHoveredIcon(null)}
+                    style={{ 
+                        cursor: 'pointer',
+                        opacity: hoveredIcon === 'back' ? 0.7 : 1,
+                        transition: 'opacity 0.2s ease'
+                    }}
                 />
 
                 {/* Unread Badge */}
@@ -283,7 +290,14 @@ const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
                     <Paperclip
                         size={24}
                         color="#007AFF"
-                        style={{ cursor: 'pointer', flexShrink: 0 }}
+                        onMouseEnter={() => setHoveredIcon('paperclip')}
+                        onMouseLeave={() => setHoveredIcon(null)}
+                        style={{ 
+                            cursor: 'pointer', 
+                            flexShrink: 0,
+                            opacity: hoveredIcon === 'paperclip' ? 0.6 : 1,
+                            transition: 'opacity 0.2s ease'
+                        }}
                         onClick={() => fileInputRef.current?.click()}
                     />
 
@@ -298,7 +312,14 @@ const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
                     <ImageIcon
                         size={24}
                         color="#007AFF"
-                        style={{ cursor: 'pointer', flexShrink: 0 }}
+                        onMouseEnter={() => setHoveredIcon('image')}
+                        onMouseLeave={() => setHoveredIcon(null)}
+                        style={{ 
+                            cursor: 'pointer', 
+                            flexShrink: 0,
+                            opacity: hoveredIcon === 'image' ? 0.6 : 1,
+                            transition: 'opacity 0.2s ease'
+                        }}
                         onClick={() => imageInputRef.current?.click()}
                     />
 
@@ -323,8 +344,10 @@ const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
                     {inputText.trim() && (
                         <div
                             onClick={handleSend}
+                            onMouseEnter={() => setHoveredIcon('send')}
+                            onMouseLeave={() => setHoveredIcon(null)}
                             style={{
-                                background: '#007AFF',
+                                background: hoveredIcon === 'send' ? '#0062CC' : '#007AFF',
                                 borderRadius: '50%',
                                 width: '32px',
                                 height: '32px',
@@ -332,7 +355,8 @@ const ChatView = ({ agent, onBack, messages, onSendMessage }) => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
-                                flexShrink: 0
+                                flexShrink: 0,
+                                transition: 'background 0.2s ease'
                             }}
                         >
                             <Send size={16} color="white" />

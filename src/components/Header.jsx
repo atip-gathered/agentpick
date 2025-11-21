@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Menu } from 'lucide-react';
 
 const Header = ({ onLogoClick, onRegisterClick, onMenuClick }) => {
+    const [hoveredElement, setHoveredElement] = useState(null);
     return (
         <header style={{
             height: '60px',
@@ -15,16 +16,20 @@ const Header = ({ onLogoClick, onRegisterClick, onMenuClick }) => {
         }}>
             <div
                 onClick={onLogoClick}
+                onMouseEnter={() => setHoveredElement('logo')}
+                onMouseLeave={() => setHoveredElement(null)}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    opacity: hoveredElement === 'logo' ? 0.8 : 1,
+                    transition: 'opacity 0.2s ease'
                 }}
             >
                 {/* Logo Image */}
                 <img
-                    src="/assets/logo-colored.png"
+                    src="/logo.png"
                     alt="AGENT PICK"
                     style={{ height: '28px', objectFit: 'contain' }}
                 />
@@ -34,20 +39,32 @@ const Header = ({ onLogoClick, onRegisterClick, onMenuClick }) => {
                 <span style={{ fontSize: '12px', color: '#333', fontWeight: '500' }}>ゲストさん</span>
                 <button
                     onClick={onRegisterClick}
+                    onMouseEnter={() => setHoveredElement('register')}
+                    onMouseLeave={() => setHoveredElement(null)}
                     style={{
-                        background: '#007AFF',
+                        background: hoveredElement === 'register' ? '#0062CC' : '#007AFF',
                         color: 'white',
                         border: 'none',
                         padding: '8px 16px',
                         borderRadius: '20px',
                         fontWeight: 'bold',
                         fontSize: '12px',
+                        transition: 'all 0.2s ease',
                         cursor: 'pointer'
                     }}
                 >
                     新規登録
                 </button>
-                <div onClick={onMenuClick} style={{ cursor: 'pointer' }}>
+                <div
+                    onClick={onMenuClick}
+                    onMouseEnter={() => setHoveredElement('menu')}
+                    onMouseLeave={() => setHoveredElement(null)}
+                    style={{ 
+                        cursor: 'pointer',
+                        opacity: hoveredElement === 'menu' ? 0.7 : 1,
+                        transition: 'opacity 0.2s ease'
+                    }}
+                >
                     <Menu size={28} color="#333" strokeWidth={2} />
                 </div>
             </div>

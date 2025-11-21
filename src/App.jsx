@@ -13,6 +13,8 @@ import MessageList from './components/MessageList';
 import ChatView from './components/ChatView';
 import ProfilePage from './components/ProfilePage';
 import SearchPage from './components/SearchPage';
+import FeaturedArticlesPage from './components/FeaturedArticlesPage';
+import ArticleDetailPage from './components/ArticleDetailPage';
 import { agents } from './mockData';
 
 function App() {
@@ -26,11 +28,12 @@ function App() {
     const [currentChatAgent, setCurrentChatAgent] = useState(null);
 
     // Navigation State
-    const [currentView, setCurrentView] = useState('landing'); // 'landing', 'swipe', 'detail', 'completion', 'login', 'register', 'messages', 'chat', 'search'
+    const [currentView, setCurrentView] = useState('landing'); // 'landing', 'swipe', 'detail', 'completion', 'login', 'register', 'messages', 'chat', 'search', 'articles', 'article-detail'
     const [selectedAgent, setSelectedAgent] = useState(null);
+    const [selectedArticle, setSelectedArticle] = useState(null);
     const activeTab = currentView === 'swipe' ? 'swipe' :
         currentView === 'search' ? 'search' :
-            currentView === 'detail' || currentView === 'completion' ? 'detail' :
+            currentView === 'detail' || currentView === 'completion' || currentView === 'articles' || currentView === 'article-detail' ? 'detail' :
                 currentView === 'messages' || currentView === 'chat' ? 'messages' :
                     'profile';
 
@@ -82,8 +85,8 @@ function App() {
         } else if (tabId === 'messages') {
             setCurrentView('messages');
         } else if (tabId === 'detail') {
-            // Navigate to detail view (could be special content page)
-            setCurrentView('detail');
+            // Navigate to articles page (featured articles)
+            setCurrentView('articles');
         } else if (tabId === 'profile') {
             setCurrentView('profile');
         } else if (tabId === 'search') {
@@ -118,7 +121,7 @@ function App() {
 
     const handleCardClick = (agent) => {
         setSelectedAgent(agent);
-        setPreviousView('swipe');
+        setPreviousView(currentView); // Track current view before navigating
         setCurrentView('detail');
     };
 
@@ -138,6 +141,11 @@ function App() {
             setSelectedAgent(agent);
             setPreviousView('search');
             setCurrentView('detail');
+        } else if (view === 'swipe') {
+            setCurrentView('swipe');
+            setSelectedAgent(null);
+        } else if (view === 'search') {
+            setCurrentView('search');
         }
     };
 
@@ -232,6 +240,20 @@ function App() {
                                 handleBackToSwipe();
                                 setTimeout(() => setSwipeCommand('right'), 100);
                             }}
+                            onNavigateToArticle={(articleId) => {
+                                // Find the article by ID from FeaturedArticlesPage's mock data
+                                // For now, we'll navigate to articles page and set the selected article
+                                setCurrentView('article-detail');
+                                // Mock article data (in production, this would come from a data source)
+                                setSelectedArticle({
+                                    id: articleId,
+                                    title: "年間MVP受賞！山田明子の転職支援ストーリー",
+                                    description: "パーソルキャリアで支社長を務める山田明子さん。彼女の転職支援における情熱と実績に迫ります。",
+                                    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                                    date: "2024.12.15",
+                                    tag: "インタビュー"
+                                });
+                            }}
                         />
                     )}
 
@@ -260,6 +282,7 @@ function App() {
                         <MessageList
                             pickedAgents={agents.filter(a => matchedAgents.includes(a.id))}
                             onNavigateToChat={handleNavigateToChat}
+                            messages={messages}
                         />
                     )}
 
@@ -270,6 +293,7 @@ function App() {
                     {currentView === 'search' && (
                         <SearchPage
                             agents={agents}
+                            matchedAgents={matchedAgents}
                             onPickAgent={(agent) => {
                                 handleMatch(agent);
                                 setSwipeCommand('right');
@@ -277,9 +301,43 @@ function App() {
                             onNavigate={(view, agent) => {
                                 if (view === 'detail') {
                                     setSelectedAgent(agent);
+                                    setPreviousView('search'); // Track that we came from search
                                     setCurrentView('detail');
                                 }
                             }}
+                        />
+                    )}
+
+                    {currentView === 'articles' && (
+                        <FeaturedArticlesPage 
+                            onNavigateToDetail={(article) => {
+                                setSelectedArticle(article);
+                                setCurrentView('article-detail');
+                            }}
+                        />
+                    )}
+
+                    {currentView === 'article-detail' && (
+                        <ArticleDetailPage 
+                            article={selectedArticle}
+                            onBack={() => setCurrentView('articles')}
+                            isLoggedIn={isLoggedIn}
+                            matchedAgents={matchedAgents}
+                            onPickAgent={(agentId) => {
+                                const agent = agents.find(a => a.id === agentId);
+                                if (agent) {
+                                    handleMatch(agent);
+                                }
+                            }}
+                            onNavigateToAgent={(agentId) => {
+                                const agent = agents.find(a => a.id === agentId);
+                                if (agent) {
+                                    setSelectedAgent(agent);
+                                    setPreviousView('article-detail');
+                                    setCurrentView('detail');
+                                }
+                            }}
+                            onNavigateToRegister={() => setCurrentView('register')}
                         />
                     )}
                 </Layout>
