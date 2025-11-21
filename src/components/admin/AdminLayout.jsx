@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, FileText, Users, UserCheck, Bell, LogOut, Shield } from 'lucide-react';
 
-const AdminLayout = ({ children, activeTab, onNavigate, onLogout, adminName }) => {
+const AdminLayout = ({ children, activeTab, onNavigate, onLogout, adminName, pendingApprovalsCount = 0 }) => {
     const [hoveredItem, setHoveredItem] = useState(null);
 
     const navItems = [
         { id: 'dashboard', label: 'ダッシュボード', icon: LayoutDashboard },
         { id: 'articles', label: '特集記事', icon: FileText },
         { id: 'agents', label: 'エージェント管理', icon: Users },
-        { id: 'approvals', label: 'プロフィール承認', icon: UserCheck },
+        { id: 'approvals', label: 'プロフィール承認', icon: UserCheck, badge: pendingApprovalsCount },
         { id: 'notifications', label: 'お知らせ', icon: Bell }
     ];
 
@@ -156,13 +156,36 @@ const AdminLayout = ({ children, activeTab, onNavigate, onLogout, adminName }) =
                                 background: isActive 
                                     ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                                     : hoveredItem === item.id ? '#F5F5F5' : 'transparent',
-                                transition: 'all 0.2s ease'
+                                transition: 'all 0.2s ease',
+                                position: 'relative'
                             }}>
                                 <Icon
                                     size={20}
                                     color={isActive ? 'white' : '#666'}
                                     strokeWidth={isActive ? 2.5 : 2}
                                 />
+                                {/* Badge for pending count */}
+                                {item.badge > 0 && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '-4px',
+                                        right: '-4px',
+                                        background: '#ef4444',
+                                        color: 'white',
+                                        borderRadius: '10px',
+                                        minWidth: '18px',
+                                        height: '18px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '10px',
+                                        fontWeight: '600',
+                                        padding: '0 4px',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                    }}>
+                                        {item.badge > 99 ? '99+' : item.badge}
+                                    </div>
+                                )}
                             </div>
                             <span style={{
                                 fontSize: '10px',

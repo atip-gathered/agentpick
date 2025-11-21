@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, UserPlus, X, Save, Mail, Phone, MapPin, Briefcase } from 'lucide-react';
+import { Plus, Edit2, Trash2, UserPlus, X, Save, Mail, Phone, MapPin, Briefcase, Eye, EyeOff } from 'lucide-react';
 
 const ChildAccountManagement = ({ childAgents, onCreateChild, onUpdateChild, onDeleteChild, onAssignUser }) => {
     const [hoveredItem, setHoveredItem] = useState(null);
@@ -149,11 +149,51 @@ const ChildAccountManagement = ({ childAgents, onCreateChild, onUpdateChild, onD
                                         担当ユーザー: {child.assignedUsers.length}名
                                     </div>
                                 )}
+                                <div style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    marginTop: '8px',
+                                    padding: '4px 10px',
+                                    borderRadius: '6px',
+                                    fontSize: '11px',
+                                    fontWeight: '600',
+                                    background: child.isPublic ? '#d1fae5' : '#fee2e2',
+                                    color: child.isPublic ? '#10b981' : '#ef4444'
+                                }}>
+                                    {child.isPublic ? <Eye size={12} /> : <EyeOff size={12} />}
+                                    {child.isPublic ? '公開中' : '非公開'}
+                                </div>
                             </div>
                             <div style={{
                                 display: 'flex',
                                 gap: '8px'
                             }}>
+                                <button
+                                    onClick={() => {
+                                        onUpdateChild(child.id, { ...child, isPublic: !child.isPublic });
+                                    }}
+                                    onMouseEnter={() => setHoveredItem(`toggle-${child.id}`)}
+                                    onMouseLeave={() => setHoveredItem(null)}
+                                    title={child.isPublic ? '非公開にする' : '公開する'}
+                                    style={{
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '6px',
+                                        border: 'none',
+                                        background: hoveredItem === `toggle-${child.id}` 
+                                            ? (child.isPublic ? '#fee2e2' : '#d1fae5')
+                                            : 'white',
+                                        color: child.isPublic ? '#ef4444' : '#10b981',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                >
+                                    {child.isPublic ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
                                 <button
                                     onClick={() => handleEdit(child)}
                                     onMouseEnter={() => setHoveredItem(`edit-${child.id}`)}
