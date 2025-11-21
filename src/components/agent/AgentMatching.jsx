@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { Users, Search, Filter, Check, Clock, CheckCircle, XCircle, Eye, MessageCircle, MoreVertical, X } from 'lucide-react';
+import { Users, Search, Filter, Check, Clock, CheckCircle, XCircle, Eye, MessageCircle, MoreVertical, X, User } from 'lucide-react';
 
-const AgentMatching = ({ matchedUsers, onNavigateToUser, onNavigateToChat, onUpdateUserStatus }) => {
+const AgentMatching = ({ matchedUsers, onNavigateToUser, onNavigateToChat, onUpdateUserStatus, agentData, childAgents }) => {
+    const isParentAccount = agentData?.isParentAccount || false;
+    
+    // Get child agent name by ID
+    const getChildAgentName = (childAgentId) => {
+        if (!childAgentId) return '親アカウント';
+        const childAgent = childAgents?.find(child => child.id === childAgentId);
+        return childAgent ? childAgent.name : '未割当';
+    };
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'active', 'in_progress', 'completed', 'declined'
     const [showFilterMenu, setShowFilterMenu] = useState(false);
@@ -664,6 +672,20 @@ const AgentMatching = ({ matchedUsers, onNavigateToUser, onNavigateToChat, onUpd
                                             }}>
                                                 {user.position || '職種未設定'}
                                             </div>
+
+                                            {isParentAccount && (
+                                                <div style={{
+                                                    fontSize: '11px',
+                                                    color: '#007AFF',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                    marginBottom: '8px'
+                                                }}>
+                                                    <User size={12} />
+                                                    担当: {getChildAgentName(user.assignedChildAgent)}
+                                                </div>
+                                            )}
 
                                             <div style={{
                                                 display: 'flex',

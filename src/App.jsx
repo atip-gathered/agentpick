@@ -100,7 +100,8 @@ function App() {
             age: '29歳',
             gender: '男性',
             location: '東京都',
-            education: '早稲田大学 理工学部 卒業'
+            education: '早稲田大学 理工学部 卒業',
+            assignedChildAgent: null // 親アカウントが直接担当
         },
         { 
             id: 2, 
@@ -118,7 +119,8 @@ function App() {
             age: '32歳',
             gender: '女性',
             location: '神奈川県',
-            education: '慶應義塾大学 商学部 卒業'
+            education: '慶應義塾大学 商学部 卒業',
+            assignedChildAgent: null // 親アカウントが直接担当
         }
     ]);
     const activeTab = currentView === 'swipe' ? 'swipe' :
@@ -544,12 +546,16 @@ function App() {
                             onViewProfile={(user) => {
                                 setSelectedUserProfile(user);
                             }}
+                            agentData={agentData}
+                            childAgents={childAgents}
                         />
                     )}
                     
                     {agentActiveTab === 'matching' && (
                         <AgentMatching
                             matchedUsers={matchedUsers}
+                            agentData={agentData}
+                            childAgents={childAgents}
                         />
                     )}
                     
