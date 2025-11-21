@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ThumbsUp, Copy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import AgentCard from './AgentCard';
 import { agents } from '../mockData';
 
 const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
+    const [hoveredButton, setHoveredButton] = useState(null);
+    
     // Use the first agent for the main visual
     const mainAgent = agents[0];
     // Use other agents for side visuals
@@ -174,9 +176,11 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
             }}>
                 <button
                     onClick={onStartSwipe}
+                    onMouseEnter={() => setHoveredButton('start-swipe')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         width: '100%',
-                        background: '#FF9500',
+                        background: hoveredButton === 'start-swipe' ? '#E68500' : '#FF9500',
                         color: 'white',
                         padding: '16px',
                         borderRadius: '100px',
@@ -187,7 +191,9 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
                         justifyContent: 'center',
                         gap: '12px',
                         boxShadow: '0 4px 12px rgba(255, 149, 0, 0.3)',
-                        border: 'none'
+                        border: 'none',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer'
                     }}
                 >
                     <ThumbsUp size={24} fill="white" strokeWidth={0} />
@@ -196,9 +202,11 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
 
                 <button
                     onClick={onRegister}
+                    onMouseEnter={() => setHoveredButton('register')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         width: '100%',
-                        background: 'white',
+                        background: hoveredButton === 'register' ? '#F5F5F5' : 'white',
                         color: '#FF9500',
                         padding: '16px',
                         borderRadius: '100px',
@@ -209,6 +217,7 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
                         justifyContent: 'center',
                         border: 'none',
                         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        transition: 'all 0.2s ease',
                         cursor: 'pointer'
                     }}
                 >
@@ -226,22 +235,32 @@ const LandingPage = ({ onStartSwipe, onLogin, onRegister }) => {
                 }}>
                     <span
                         onClick={onLogin}
+                        onMouseEnter={() => setHoveredButton('login')}
+                        onMouseLeave={() => setHoveredButton(null)}
                         style={{
                             cursor: 'pointer',
                             textDecoration: 'underline',
-                            textUnderlineOffset: '4px'
+                            textUnderlineOffset: '4px',
+                            opacity: hoveredButton === 'login' ? 0.8 : 1,
+                            transition: 'opacity 0.2s ease'
                         }}
                     >
                         ログイン
                     </span>
-                    <span style={{
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        textDecoration: 'underline',
-                        textUnderlineOffset: '4px'
-                    }}>
+                    <span
+                        onMouseEnter={() => setHoveredButton('how-to-use')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        style={{
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            textDecoration: 'underline',
+                            textUnderlineOffset: '4px',
+                            opacity: hoveredButton === 'how-to-use' ? 0.8 : 1,
+                            transition: 'opacity 0.2s ease'
+                        }}
+                    >
                         AGENT PICKの使い方 <Copy size={18} strokeWidth={2.5} />
                     </span>
                 </div>

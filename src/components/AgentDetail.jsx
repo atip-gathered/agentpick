@@ -1,7 +1,9 @@
-import React from 'react';
-import { ArrowLeft, ThumbsUp, User, Sparkles, Building2, MapPin, MessageCircle, Tag } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, ThumbsUp, User, Sparkles, Building2, MapPin, MessageCircle, Tag, FileText } from 'lucide-react';
 
-const AgentDetail = ({ agent, onBack, onLike, isMatched }) => {
+const AgentDetail = ({ agent, onBack, onLike, isMatched, onNavigateToArticle }) => {
+    const [hoveredButton, setHoveredButton] = useState(null);
+    
     if (!agent) return null;
 
     const SectionCard = ({ icon: Icon, title, children }) => (
@@ -61,11 +63,16 @@ const AgentDetail = ({ agent, onBack, onLike, isMatched }) => {
 
             {/* Header Image Area */}
             <div style={{ background: 'white', paddingBottom: '24px', marginBottom: '16px' }}>
-                <div style={{ position: 'relative', height: '200px', marginBottom: '16px' }}>
+                <div style={{ position: 'relative', height: '280px', marginBottom: '16px' }}>
                     <img
                         src={agent.image}
                         alt={agent.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover',
+                            objectPosition: 'center 20%'
+                        }}
                     />
                     {/* Back Button (Invisible touch area mostly, but let's keep it functional) */}
                     {/* Note: Figma doesn't show a clear back button on the image provided, 
@@ -77,18 +84,23 @@ const AgentDetail = ({ agent, onBack, onLike, isMatched }) => {
            */}
                     <button
                         onClick={onBack}
+                        onMouseEnter={() => setHoveredButton('back')}
+                        onMouseLeave={() => setHoveredButton(null)}
                         style={{
                             position: 'absolute',
                             top: '10px',
                             left: '10px',
-                            background: 'rgba(255,255,255,0.9)',
+                            background: hoveredButton === 'back' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.9)',
                             borderRadius: '50%',
                             width: '32px',
                             height: '32px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                            transition: 'all 0.2s ease',
+                            cursor: 'pointer',
+                            border: 'none'
                         }}
                     >
                         <ArrowLeft size={20} color="#333" />
@@ -133,12 +145,15 @@ const AgentDetail = ({ agent, onBack, onLike, isMatched }) => {
                         {agent.bio}
                     </p>
 
-                    {!isMatched && (
+                    {/* Featured Article Button - Show if agent has featured article */}
+                    {agent.featuredArticleId && (
                         <button
-                            onClick={onLike}
+                            onClick={() => onNavigateToArticle && onNavigateToArticle(agent.featuredArticleId)}
+                            onMouseEnter={() => setHoveredButton('article')}
+                            onMouseLeave={() => setHoveredButton(null)}
                             style={{
                                 width: '100%',
-                                background: '#FF9500',
+                                background: hoveredButton === 'article' ? '#0051CC' : '#007AFF',
                                 color: 'white',
                                 padding: '14px',
                                 borderRadius: '100px',
@@ -148,7 +163,39 @@ const AgentDetail = ({ agent, onBack, onLike, isMatched }) => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '8px',
-                                boxShadow: '0 4px 12px rgba(255, 149, 0, 0.3)'
+                                boxShadow: '0 4px 12px rgba(0, 122, 255, 0.3)',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer',
+                                border: 'none',
+                                marginBottom: '12px'
+                            }}
+                        >
+                            <FileText size={20} />
+                            特集記事を見る
+                        </button>
+                    )}
+
+                    {!isMatched && (
+                        <button
+                            onClick={onLike}
+                            onMouseEnter={() => setHoveredButton('pick')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            style={{
+                                width: '100%',
+                                background: hoveredButton === 'pick' ? '#E68500' : '#FF9500',
+                                color: 'white',
+                                padding: '14px',
+                                borderRadius: '100px',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(255, 149, 0, 0.3)',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer',
+                                border: 'none'
                             }}
                         >
                             <ThumbsUp size={20} fill="white" strokeWidth={0} />

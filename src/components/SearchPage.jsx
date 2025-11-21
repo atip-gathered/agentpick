@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ChevronDown, ChevronUp, ThumbsUp } from 'lucide-react';
 
-const SearchPage = ({ agents = [], onPickAgent, onNavigate }) => {
+const SearchPage = ({ agents = [], matchedAgents = [], onPickAgent, onNavigate }) => {
     const [searchFilters, setSearchFilters] = useState({
         keyword: '',
         specialties: [],
@@ -22,6 +22,8 @@ const SearchPage = ({ agents = [], onPickAgent, onNavigate }) => {
         companyType: false,
         areas: false
     });
+
+    const [hoveredButton, setHoveredButton] = useState(null); // Track which button is hovered
 
     const specialtyOptions = [
         '営業系',
@@ -593,12 +595,16 @@ const SearchPage = ({ agents = [], onPickAgent, onNavigate }) => {
 
                 {/* Search Button */}
                 <button
+                    onMouseEnter={() => setHoveredButton('search')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         width: '100%',
                         padding: '14px',
                         borderRadius: '30px',
                         border: 'none',
-                        background: 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
+                        background: hoveredButton === 'search'
+                            ? 'linear-gradient(90deg, #E68500 0%, #E67000 100%)'
+                            : 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
                         color: 'white',
                         fontSize: '16px',
                         fontWeight: 'bold',
@@ -607,7 +613,8 @@ const SearchPage = ({ agents = [], onPickAgent, onNavigate }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        transition: 'all 0.2s ease'
                     }}
                 >
                     <Search size={18} />
@@ -628,15 +635,18 @@ const SearchPage = ({ agents = [], onPickAgent, onNavigate }) => {
                             areas: []
                         });
                     }}
+                    onMouseEnter={() => setHoveredButton('reset')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         textAlign: 'center',
                         fontSize: '14px',
-                        color: '#007AFF',
+                        color: hoveredButton === 'reset' ? '#0056B3' : '#007AFF',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '4px'
+                        gap: '4px',
+                        transition: 'color 0.2s ease'
                     }}
                 >
                     <span style={{ fontSize: '16px' }}>↻</span>
@@ -735,26 +745,42 @@ const SearchPage = ({ agents = [], onPickAgent, onNavigate }) => {
 
                         {/* Pick Button */}
                         <button
-                            onClick={() => onPickAgent && onPickAgent(agent)}
+                            onClick={() => {
+                                if (!matchedAgents.includes(agent.id)) {
+                                    onPickAgent && onPickAgent(agent);
+                                }
+                            }}
+                            onMouseEnter={() => setHoveredButton(`pick-${agent.id}`)}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            disabled={matchedAgents.includes(agent.id)}
                             style={{
                                 width: '100%',
                                 padding: '16px',
                                 borderRadius: '30px',
                                 border: 'none',
-                                background: 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
-                                color: 'white',
+                                background: matchedAgents.includes(agent.id)
+                                    ? '#E5E5EA'
+                                    : hoveredButton === `pick-${agent.id}`
+                                        ? 'linear-gradient(90deg, #E68500 0%, #E67000 100%)'
+                                        : 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
+                                color: matchedAgents.includes(agent.id) ? '#8E8E93' : 'white',
                                 fontSize: '16px',
                                 fontWeight: 'bold',
-                                cursor: 'pointer',
+                                cursor: matchedAgents.includes(agent.id) ? 'not-allowed' : 'pointer',
                                 marginBottom: '12px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '8px'
+                                gap: '8px',
+                                opacity: matchedAgents.includes(agent.id) ? 0.7 : 1,
+                                transition: 'all 0.2s ease'
                             }}
                         >
-                            <ThumbsUp size={20} fill="white" />
-                            ピックする
+                            <ThumbsUp 
+                                size={20} 
+                                fill={matchedAgents.includes(agent.id) ? '#8E8E93' : 'white'} 
+                            />
+                            {matchedAgents.includes(agent.id) ? 'ピック済み' : 'ピックする'}
                         </button>
 
                         {/* Detail Link */}

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, User, ThumbsUp, Search, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
+    const [hoveredElement, setHoveredElement] = useState(null);
+    
     if (!isOpen) return null;
 
     return (
@@ -32,7 +34,16 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                     {/* Logo (Blue/Navy) */}
                     <img src="/logo-colored.png" alt="AGENT PICK" style={{ height: '24px' }} />
                 </div>
-                <div onClick={onClose} style={{ cursor: 'pointer' }}>
+                <div
+                    onClick={onClose}
+                    onMouseEnter={() => setHoveredElement('close')}
+                    onMouseLeave={() => setHoveredElement(null)}
+                    style={{ 
+                        cursor: 'pointer',
+                        opacity: hoveredElement === 'close' ? 0.7 : 1,
+                        transition: 'opacity 0.2s ease'
+                    }}
+                >
                     <X size={32} color="#1c274c" />
                 </div>
             </div>
@@ -51,9 +62,11 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                 {isLoggedIn ? (
                     <button
                         onClick={onMyPage}
+                        onMouseEnter={() => setHoveredElement('mypage')}
+                        onMouseLeave={() => setHoveredElement(null)}
                         style={{
                             width: '100%',
-                            background: '#007AFF',
+                            background: hoveredElement === 'mypage' ? '#0062CC' : '#007AFF',
                             color: 'white',
                             padding: '16px',
                             borderRadius: '100px',
@@ -65,6 +78,7 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                             justifyContent: 'center',
                             gap: '8px',
                             boxShadow: '0 4px 12px rgba(0,122,255,0.3)',
+                            transition: 'all 0.2s ease',
                             cursor: 'pointer'
                         }}
                     >
@@ -74,9 +88,11 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                 ) : (
                     <button
                         onClick={onLogin}
+                        onMouseEnter={() => setHoveredElement('login')}
+                        onMouseLeave={() => setHoveredElement(null)}
                         style={{
                             width: '100%',
-                            background: '#007AFF',
+                            background: hoveredElement === 'login' ? '#0062CC' : '#007AFF',
                             color: 'white',
                             padding: '16px',
                             borderRadius: '100px',
@@ -88,6 +104,7 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                             justifyContent: 'center',
                             gap: '8px',
                             boxShadow: '0 4px 12px rgba(0,122,255,0.3)',
+                            transition: 'all 0.2s ease',
                             cursor: 'pointer'
                         }}
                     >
@@ -97,22 +114,27 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                 )}
 
                 {/* Pick Button */}
-                <button style={{
-                    width: '100%',
-                    background: '#FF9500',
-                    color: 'white',
-                    padding: '16px',
-                    borderRadius: '100px',
-                    fontWeight: 'bold',
-                    fontSize: '18px',
-                    border: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 12px rgba(255,149,0,0.3)',
-                    cursor: 'pointer'
-                }}>
+                <button
+                    onMouseEnter={() => setHoveredElement('pick')}
+                    onMouseLeave={() => setHoveredElement(null)}
+                    style={{
+                        width: '100%',
+                        background: hoveredElement === 'pick' ? '#E68500' : '#FF9500',
+                        color: 'white',
+                        padding: '16px',
+                        borderRadius: '100px',
+                        fontWeight: 'bold',
+                        fontSize: '18px',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 12px rgba(255,149,0,0.3)',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer'
+                    }}
+                >
                     <ThumbsUp size={24} fill="white" />
                     ピックする
                 </button>
@@ -148,18 +170,24 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                 </div>
 
                 {/* Help Link */}
-                <div style={{
-                    width: '100%',
-                    marginTop: '24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    color: '#007AFF',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    textDecoration: 'underline',
-                    cursor: 'pointer'
-                }}>
+                <div
+                    onMouseEnter={() => setHoveredElement('help')}
+                    onMouseLeave={() => setHoveredElement(null)}
+                    style={{
+                        width: '100%',
+                        marginTop: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: '#007AFF',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        textDecoration: 'underline',
+                        opacity: hoveredElement === 'help' ? 0.7 : 1,
+                        transition: 'opacity 0.2s ease',
+                        cursor: 'pointer'
+                    }}
+                >
                     <HelpCircle size={20} />
                     AGENT PICKの使い方
                 </div>
@@ -173,10 +201,50 @@ const MenuOverlay = ({ isOpen, onClose, isLoggedIn, onLogin, onMyPage }) => {
                 fontSize: '12px'
             }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-                    <div>&gt; プライバシーポリシー</div>
-                    <div>&gt; 利用規約</div>
-                    <div>&gt; お問い合わせ</div>
-                    <div>&gt; 運営会社</div>
+                    <div
+                        onMouseEnter={() => setHoveredElement('footer-1')}
+                        onMouseLeave={() => setHoveredElement(null)}
+                        style={{
+                            opacity: hoveredElement === 'footer-1' ? 0.7 : 1,
+                            transition: 'opacity 0.2s ease',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        &gt; プライバシーポリシー
+                    </div>
+                    <div
+                        onMouseEnter={() => setHoveredElement('footer-2')}
+                        onMouseLeave={() => setHoveredElement(null)}
+                        style={{
+                            opacity: hoveredElement === 'footer-2' ? 0.7 : 1,
+                            transition: 'opacity 0.2s ease',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        &gt; 利用規約
+                    </div>
+                    <div
+                        onMouseEnter={() => setHoveredElement('footer-3')}
+                        onMouseLeave={() => setHoveredElement(null)}
+                        style={{
+                            opacity: hoveredElement === 'footer-3' ? 0.7 : 1,
+                            transition: 'opacity 0.2s ease',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        &gt; お問い合わせ
+                    </div>
+                    <div
+                        onMouseEnter={() => setHoveredElement('footer-4')}
+                        onMouseLeave={() => setHoveredElement(null)}
+                        style={{
+                            opacity: hoveredElement === 'footer-4' ? 0.7 : 1,
+                            transition: 'opacity 0.2s ease',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        &gt; 運営会社
+                    </div>
                 </div>
                 <div style={{ color: '#8E8E93' }}>
                     ©AGENT PICK ALL RIGHTS RESERVED.

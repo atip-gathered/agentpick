@@ -3,6 +3,7 @@ import { Edit, Download, Upload, Check, X } from 'lucide-react';
 
 const ProfilePage = ({ onNavigate }) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [hoveredButton, setHoveredButton] = useState(null);
     const resumeInputRef = useRef(null);
     const workHistoryInputRef = useRef(null);
 
@@ -135,18 +136,21 @@ const ProfilePage = ({ onNavigate }) => {
                             {!isEditing ? (
                                 <button
                                     onClick={handleEdit}
+                                    onMouseEnter={() => setHoveredButton('edit')}
+                                    onMouseLeave={() => setHoveredButton(null)}
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '4px',
-                                        background: 'white',
+                                        background: hoveredButton === 'edit' ? '#F0F8FF' : 'white',
                                         border: '1px solid #007AFF',
                                         borderRadius: '4px',
                                         padding: '5px 10px',
                                         color: '#007AFF',
                                         fontSize: '12px',
                                         cursor: 'pointer',
-                                        fontWeight: '500'
+                                        fontWeight: '500',
+                                        transition: 'all 0.2s ease'
                                     }}
                                 >
                                     <Edit size={12} strokeWidth={2} />
@@ -156,18 +160,21 @@ const ProfilePage = ({ onNavigate }) => {
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <button
                                         onClick={handleSave}
+                                        onMouseEnter={() => setHoveredButton('save')}
+                                        onMouseLeave={() => setHoveredButton(null)}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: '4px',
-                                            background: '#007AFF',
+                                            background: hoveredButton === 'save' ? '#0051CC' : '#007AFF',
                                             border: 'none',
                                             borderRadius: '4px',
                                             padding: '5px 10px',
                                             color: 'white',
                                             fontSize: '12px',
                                             cursor: 'pointer',
-                                            fontWeight: '500'
+                                            fontWeight: '500',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         <Check size={12} strokeWidth={2} />
@@ -175,18 +182,21 @@ const ProfilePage = ({ onNavigate }) => {
                                     </button>
                                     <button
                                         onClick={handleCancel}
+                                        onMouseEnter={() => setHoveredButton('cancel')}
+                                        onMouseLeave={() => setHoveredButton(null)}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: '4px',
-                                            background: '#FF3B30',
+                                            background: hoveredButton === 'cancel' ? '#E62E24' : '#FF3B30',
                                             border: 'none',
                                             borderRadius: '4px',
                                             padding: '5px 10px',
                                             color: 'white',
                                             fontSize: '12px',
                                             cursor: 'pointer',
-                                            fontWeight: '500'
+                                            fontWeight: '500',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         <X size={12} strokeWidth={2} />
@@ -379,29 +389,36 @@ const ProfilePage = ({ onNavigate }) => {
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 {profileData.resume ? (
                                     <>
-                                        <button style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            background: 'transparent',
-                                            border: 'none',
-                                            color: '#007AFF',
-                                            fontSize: '13px',
-                                            cursor: 'pointer'
-                                        }}>
+                                        <button 
+                                            onMouseEnter={() => setHoveredButton('resume-download')}
+                                            onMouseLeave={() => setHoveredButton(null)}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                color: hoveredButton === 'resume-download' ? '#0051CC' : '#007AFF',
+                                                fontSize: '13px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease'
+                                            }}>
                                             <Download size={14} />
                                             {profileData.resume}
                                         </button>
                                         <button
                                             onClick={() => setProfileData(prev => ({ ...prev, resume: null }))}
+                                            onMouseEnter={() => setHoveredButton('resume-delete')}
+                                            onMouseLeave={() => setHoveredButton(null)}
                                             style={{
-                                                background: '#FF3B30',
+                                                background: hoveredButton === 'resume-delete' ? '#E62E24' : '#FF3B30',
                                                 border: 'none',
                                                 borderRadius: '4px',
                                                 padding: '4px 10px',
                                                 color: 'white',
                                                 fontSize: '12px',
-                                                cursor: 'pointer'
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease'
                                             }}
                                         >
                                             削除
@@ -410,15 +427,18 @@ const ProfilePage = ({ onNavigate }) => {
                                 ) : (
                                     <button
                                         onClick={() => resumeInputRef.current?.click()}
+                                        onMouseEnter={() => setHoveredButton('resume-upload')}
+                                        onMouseLeave={() => setHoveredButton(null)}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: '6px',
                                             background: 'transparent',
                                             border: 'none',
-                                            color: '#007AFF',
+                                            color: hoveredButton === 'resume-upload' ? '#0051CC' : '#007AFF',
                                             fontSize: '13px',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         <Upload size={14} />
@@ -446,29 +466,36 @@ const ProfilePage = ({ onNavigate }) => {
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 {profileData.workHistory ? (
                                     <>
-                                        <button style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            background: 'transparent',
-                                            border: 'none',
-                                            color: '#007AFF',
-                                            fontSize: '13px',
-                                            cursor: 'pointer'
-                                        }}>
+                                        <button 
+                                            onMouseEnter={() => setHoveredButton('work-download')}
+                                            onMouseLeave={() => setHoveredButton(null)}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                color: hoveredButton === 'work-download' ? '#0051CC' : '#007AFF',
+                                                fontSize: '13px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease'
+                                            }}>
                                             <Download size={14} />
                                             {profileData.workHistory}
                                         </button>
                                         <button
                                             onClick={() => setProfileData(prev => ({ ...prev, workHistory: null }))}
+                                            onMouseEnter={() => setHoveredButton('work-delete')}
+                                            onMouseLeave={() => setHoveredButton(null)}
                                             style={{
-                                                background: '#FF3B30',
+                                                background: hoveredButton === 'work-delete' ? '#E62E24' : '#FF3B30',
                                                 border: 'none',
                                                 borderRadius: '4px',
                                                 padding: '4px 10px',
                                                 color: 'white',
                                                 fontSize: '12px',
-                                                cursor: 'pointer'
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease'
                                             }}
                                         >
                                             削除
@@ -477,15 +504,18 @@ const ProfilePage = ({ onNavigate }) => {
                                 ) : (
                                     <button
                                         onClick={() => workHistoryInputRef.current?.click()}
+                                        onMouseEnter={() => setHoveredButton('work-upload')}
+                                        onMouseLeave={() => setHoveredButton(null)}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: '6px',
                                             background: 'transparent',
                                             border: 'none',
-                                            color: '#007AFF',
+                                            color: hoveredButton === 'work-upload' ? '#0051CC' : '#007AFF',
                                             fontSize: '13px',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         <Upload size={14} />
@@ -503,14 +533,18 @@ const ProfilePage = ({ onNavigate }) => {
                     marginTop: '20px',
                     marginBottom: '20px'
                 }}>
-                    <button style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#FF3B30',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        textDecoration: 'underline'
-                    }}>
+                    <button 
+                        onMouseEnter={() => setHoveredButton('logout')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: hoveredButton === 'logout' ? '#E62E24' : '#FF3B30',
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                            transition: 'all 0.2s ease'
+                        }}>
                         ログアウト
                     </button>
                 </div>
@@ -524,9 +558,13 @@ const ProfilePage = ({ onNavigate }) => {
                 }}>
                     <button
                         onClick={() => onNavigate && onNavigate('swipe')}
+                        onMouseEnter={() => setHoveredButton('pick-agent')}
+                        onMouseLeave={() => setHoveredButton(null)}
                         style={{
                             width: '100%',
-                            background: 'linear-gradient(90deg, #FF9500 0%, #FF6B00 100%)',
+                            background: hoveredButton === 'pick-agent' 
+                                ? 'linear-gradient(90deg, #E68500 0%, #E65500 100%)'
+                                : 'linear-gradient(90deg, #FF9500 0%, #FF6B00 100%)',
                             color: 'white',
                             border: 'none',
                             borderRadius: '24px',
@@ -534,21 +572,31 @@ const ProfilePage = ({ onNavigate }) => {
                             fontSize: '15px',
                             fontWeight: 'bold',
                             cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(255, 149, 0, 0.3)'
+                            boxShadow: hoveredButton === 'pick-agent'
+                                ? '0 6px 16px rgba(255, 149, 0, 0.4)'
+                                : '0 4px 12px rgba(255, 149, 0, 0.3)',
+                            transform: hoveredButton === 'pick-agent' ? 'translateY(-1px)' : 'none',
+                            transition: 'all 0.2s ease'
                         }}
                     >
                         エージェントをピックする
                     </button>
-                    <button style={{
-                        width: '100%',
-                        background: 'transparent',
-                        color: '#007AFF',
-                        border: 'none',
-                        padding: '8px',
-                        fontSize: '15px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                    }}>
+                    <button 
+                        onClick={() => onNavigate && onNavigate('search')}
+                        onMouseEnter={() => setHoveredButton('search-agent')}
+                        onMouseLeave={() => setHoveredButton(null)}
+                        style={{
+                            width: '100%',
+                            background: 'transparent',
+                            color: hoveredButton === 'search-agent' ? '#0051CC' : '#007AFF',
+                            border: 'none',
+                            padding: '8px',
+                            fontSize: '15px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
                         エージェントを探す
                     </button>
                 </div>

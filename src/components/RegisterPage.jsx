@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mail, Lock } from 'lucide-react';
 
 const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
+    const [hoveredButton, setHoveredButton] = useState(null);
     return (
         <div style={{
             width: '100%',
@@ -120,9 +121,11 @@ const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
                 {/* Register Button */}
                 <button
                     onClick={onRegister}
+                    onMouseEnter={() => setHoveredButton('register')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         width: '100%',
-                        background: 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
+                        background: hoveredButton === 'register' ? 'linear-gradient(90deg, #E68500 0%, #E67300 100%)' : 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
                         color: 'white',
                         padding: '16px',
                         borderRadius: '30px',
@@ -130,6 +133,7 @@ const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
                         fontSize: '18px',
                         border: 'none',
                         marginBottom: '16px',
+                        transition: 'all 0.2s ease',
                         cursor: 'pointer'
                     }}
                 >
@@ -138,10 +142,14 @@ const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
 
                 <div
                     onClick={onNavigateToLogin}
+                    onMouseEnter={() => setHoveredButton('login-link')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         fontSize: '14px',
                         color: '#333',
                         textAlign: 'center',
+                        opacity: hoveredButton === 'login-link' ? 0.7 : 1,
+                        transition: 'opacity 0.2s ease',
                         cursor: 'pointer',
                         marginBottom: '40px',
                         textDecoration: 'underline'
@@ -161,21 +169,26 @@ const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
                         外部IDで登録
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <button style={{
-                            width: '100%',
-                            background: 'white',
-                            border: '2px solid #E5E5EA',
-                            color: '#007AFF',
-                            padding: '14px',
-                            borderRadius: '30px',
-                            fontWeight: 'bold',
-                            fontSize: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            cursor: 'pointer'
-                        }}>
+                        <button
+                            onMouseEnter={() => setHoveredButton('google-register')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            style={{
+                                width: '100%',
+                                background: hoveredButton === 'google-register' ? '#F5F5F5' : 'white',
+                                border: '2px solid #E5E5EA',
+                                color: '#007AFF',
+                                padding: '14px',
+                                borderRadius: '30px',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer'
+                            }}
+                        >
                             <span style={{
                                 fontSize: '22px',
                                 fontWeight: 'bold',
@@ -183,21 +196,26 @@ const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
                             }}>G</span>
                             Googleアカウントで登録
                         </button>
-                        <button style={{
-                            width: '100%',
-                            background: 'white',
-                            border: '2px solid #E5E5EA',
-                            color: '#007AFF',
-                            padding: '14px',
-                            borderRadius: '30px',
-                            fontWeight: 'bold',
-                            fontSize: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            cursor: 'pointer'
-                        }}>
+                        <button
+                            onMouseEnter={() => setHoveredButton('line-register')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            style={{
+                                width: '100%',
+                                background: hoveredButton === 'line-register' ? '#F5F5F5' : 'white',
+                                border: '2px solid #E5E5EA',
+                                color: '#007AFF',
+                                padding: '14px',
+                                borderRadius: '30px',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer'
+                            }}
+                        >
                             <div style={{
                                 width: '24px',
                                 height: '24px',

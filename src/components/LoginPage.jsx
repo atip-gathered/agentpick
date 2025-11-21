@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mail, Lock, User, Briefcase } from 'lucide-react';
 
 const LoginPage = ({ onLogin, onNavigateToRegister }) => {
+    const [hoveredButton, setHoveredButton] = useState(null);
     return (
         <div style={{
             width: '100%',
@@ -88,9 +89,11 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
                 {/* Login Button */}
                 <button
                     onClick={onLogin}
+                    onMouseEnter={() => setHoveredButton('login')}
+                    onMouseLeave={() => setHoveredButton(null)}
                     style={{
                         width: '100%',
-                        background: 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
+                        background: hoveredButton === 'login' ? 'linear-gradient(90deg, #E68500 0%, #E67300 100%)' : 'linear-gradient(90deg, #FF9500 0%, #FF8000 100%)',
                         color: 'white',
                         padding: '16px',
                         borderRadius: '30px',
@@ -98,19 +101,26 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
                         fontSize: '18px',
                         border: 'none',
                         marginBottom: '16px',
+                        transition: 'all 0.2s ease',
                         cursor: 'pointer'
                     }}
                 >
                     ログイン
                 </button>
 
-                <div style={{
-                    fontSize: '14px',
-                    color: '#333',
-                    textAlign: 'center',
-                    marginBottom: '32px',
-                    cursor: 'pointer'
-                }}>
+                <div
+                    onMouseEnter={() => setHoveredButton('forgot-password')}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    style={{
+                        fontSize: '14px',
+                        color: '#333',
+                        textAlign: 'center',
+                        marginBottom: '32px',
+                        opacity: hoveredButton === 'forgot-password' ? 0.7 : 1,
+                        transition: 'opacity 0.2s ease',
+                        cursor: 'pointer'
+                    }}
+                >
                     パスワードをお忘れですか？
                 </div>
 
@@ -138,6 +148,8 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
                     }}>
                         <div
                             onClick={onNavigateToRegister}
+                            onMouseEnter={() => setHoveredButton('register-job-seeker')}
+                            onMouseLeave={() => setHoveredButton(null)}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -146,6 +158,8 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
                                 color: '#333',
                                 fontWeight: '600',
                                 fontSize: '15px',
+                                opacity: hoveredButton === 'register-job-seeker' ? 0.7 : 1,
+                                transition: 'opacity 0.2s ease',
                                 cursor: 'pointer',
                                 textDecoration: 'underline'
                             }}
@@ -153,17 +167,23 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
                             <User size={20} style={{ color: '#333' }} />
                             求職者として登録
                         </div>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            color: '#333',
-                            fontWeight: '600',
-                            fontSize: '15px',
-                            cursor: 'pointer',
-                            textDecoration: 'underline'
-                        }}>
+                        <div
+                            onMouseEnter={() => setHoveredButton('register-agent')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                color: '#333',
+                                fontWeight: '600',
+                                fontSize: '15px',
+                                opacity: hoveredButton === 'register-agent' ? 0.7 : 1,
+                                transition: 'opacity 0.2s ease',
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                            }}
+                        >
                             <Briefcase size={20} style={{ color: '#333' }} />
                             エージェントとして登録
                         </div>
@@ -181,21 +201,26 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
                         外部IDでログイン
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <button style={{
-                            width: '100%',
-                            background: 'white',
-                            border: '2px solid #E5E5EA',
-                            color: '#007AFF',
-                            padding: '14px',
-                            borderRadius: '30px',
-                            fontWeight: 'bold',
-                            fontSize: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            cursor: 'pointer'
-                        }}>
+                        <button
+                            onMouseEnter={() => setHoveredButton('google-login')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            style={{
+                                width: '100%',
+                                background: hoveredButton === 'google-login' ? '#F5F5F5' : 'white',
+                                border: '2px solid #E5E5EA',
+                                color: '#007AFF',
+                                padding: '14px',
+                                borderRadius: '30px',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer'
+                            }}
+                        >
                             <span style={{
                                 fontSize: '22px',
                                 fontWeight: 'bold',
@@ -203,21 +228,26 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
                             }}>G</span>
                             Googleアカウントでログイン
                         </button>
-                        <button style={{
-                            width: '100%',
-                            background: 'white',
-                            border: '2px solid #E5E5EA',
-                            color: '#007AFF',
-                            padding: '14px',
-                            borderRadius: '30px',
-                            fontWeight: 'bold',
-                            fontSize: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                            cursor: 'pointer'
-                        }}>
+                        <button
+                            onMouseEnter={() => setHoveredButton('line-login')}
+                            onMouseLeave={() => setHoveredButton(null)}
+                            style={{
+                                width: '100%',
+                                background: hoveredButton === 'line-login' ? '#F5F5F5' : 'white',
+                                border: '2px solid #E5E5EA',
+                                color: '#007AFF',
+                                padding: '14px',
+                                borderRadius: '30px',
+                                fontWeight: 'bold',
+                                fontSize: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px',
+                                transition: 'all 0.2s ease',
+                                cursor: 'pointer'
+                            }}
+                        >
                             <div style={{
                                 width: '24px',
                                 height: '24px',
