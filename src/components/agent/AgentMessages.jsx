@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, Search, Send, Paperclip, Image, Mic, Check, CheckCheck, ArrowLeft, Filter, User } from 'lucide-react';
 
-const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser, onViewProfile, agentData, childAgents }) => {
+const AgentMessages = ({ matchedUsers, messages, onSendMessage, onNavigateToUser, onViewProfile, agentData, childAgents, initialSelectedUserId }) => {
     const isParentAccount = agentData?.isParentAccount || false;
     const [selectedUser, setSelectedUser] = useState(null);
+    
+    // Set initial selected user if provided
+    useEffect(() => {
+        if (initialSelectedUserId) {
+            const user = matchedUsers.find(u => u.id === initialSelectedUserId);
+            if (user) {
+                setSelectedUser(user);
+            }
+        }
+    }, [initialSelectedUserId, matchedUsers]);
     const [messageText, setMessageText] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'unread', 'active'

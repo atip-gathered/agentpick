@@ -46,6 +46,7 @@ function App() {
     const [agentData, setAgentData] = useState(null);
     const [agentActiveTab, setAgentActiveTab] = useState('dashboard');
     const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+    const [selectedMessageUserId, setSelectedMessageUserId] = useState(null);
     const [childAgents, setChildAgents] = useState([]);
     
     // Child Agent Management Handlers
@@ -513,7 +514,13 @@ function App() {
             {isAgentMode && currentView === 'agent-dashboard' && agentData && (
                 <AgentLayout
                     activeTab={agentActiveTab}
-                    onNavigate={(tab) => setAgentActiveTab(tab)}
+                    onNavigate={(tab) => {
+                        setAgentActiveTab(tab);
+                        // Reset selected message user when navigating away from messages tab
+                        if (tab !== 'messages') {
+                            setSelectedMessageUserId(null);
+                        }
+                    }}
                     onLogout={() => {
                         setIsAgentMode(false);
                         setAgentData(null);
@@ -548,6 +555,7 @@ function App() {
                             }}
                             agentData={agentData}
                             childAgents={childAgents}
+                            initialSelectedUserId={selectedMessageUserId}
                         />
                     )}
                     
@@ -558,6 +566,10 @@ function App() {
                             childAgents={childAgents}
                             onViewProfile={(user) => {
                                 setSelectedUserProfile(user);
+                            }}
+                            onNavigateToChat={(userId) => {
+                                setSelectedMessageUserId(userId);
+                                setAgentActiveTab('messages');
                             }}
                         />
                     )}
